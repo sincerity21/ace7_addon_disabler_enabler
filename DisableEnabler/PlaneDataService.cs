@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using UAssetAPI;
-using UAssetAPI.PropertyTypes.Objects;
+using UAssetAPI.UnrealTypes;
 
 namespace DisableEnabler;
 
@@ -29,10 +29,11 @@ public static class PlaneDataService
         log($"Exporting JSON to {jsonPath}");
 
         // Use UAssetAPI to load the asset and export JSON
-        var asset = new UAsset(assetPath, UE4Version.VER_UE4_18);
-        var jObject = asset.ToJson();
-        File.WriteAllText(jsonPath, jObject.ToString());
+        var asset = new UAsset(assetPath, EngineVersion.VER_UE4_18);
+        var json = asset.SerializeJson(true);
+        File.WriteAllText(jsonPath, json);
 
+        var jObject = JObject.Parse(json);
         var rows = ExtractPlaneRows(jObject, log);
         return (rows, jsonPath);
     }
@@ -116,10 +117,7 @@ public static class PlaneDataService
     public static void SaveJsonBackToUAsset(string assetPath, string jsonPath, Action<string> log)
     {
         var jsonText = File.ReadAllText(jsonPath);
-        var jObject = JObject.Parse(jsonText);
-
-        var asset = new UAsset(assetPath, UE4Version.VER_UE4_18);
-        asset.ReadFromJson(jObject);
+        var asset = UAsset.DeserializeJson(jsonText);
         asset.Write(assetPath);
 
         log($"Saved modified PlayerPlaneDataTable.uasset back to {assetPath}");
