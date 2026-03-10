@@ -1,11 +1,13 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Drawing;
+using Newtonsoft.Json;
 
 namespace DisableEnabler;
 
@@ -17,6 +19,13 @@ public partial class MainForm : Form
     private static readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DisableEnabler.config");
     private bool _isDarkMode;
 
+    /// <summary>Max search bar width so it stops at the toggles (left edge of Dark mode / Hide Base Game).</summary>
+    private const int SearchBarMaxWidth = 430 - 12 - 8; // toggle area starts at 430, left margin 12, gap 8
+    private const int SearchBarLeft = 12;
+    private const int SearchExportGap = 8;
+    private const int ExportButtonWidth = 90;
+    private const int ImportButtonWidth = 92;
+
     public MainForm()
     {
         InitializeComponent();
@@ -24,6 +33,27 @@ public partial class MainForm : Form
         planesGrid.DataSource = _planes;
         LoadConfig();
         ApplyTheme();
+        Resize += MainForm_Resize;
+        LayoutSearchAndExportImport();
+    }
+
+    private void MainForm_Resize(object? sender, EventArgs e)
+    {
+        LayoutSearchAndExportImport();
+    }
+
+    private void LayoutSearchAndExportImport()
+    {
+        var rightReserved = SearchExportGap + ExportButtonWidth + SearchExportGap + ImportButtonWidth;
+        var w = Math.Min(ClientSize.Width - SearchBarLeft - rightReserved - 12, SearchBarMaxWidth); // don't extend past toggles
+        if (w < 80) w = 80;
+        searchTextBox.Width = w;
+        searchTextBox.Left = SearchBarLeft;
+        var x = SearchBarLeft + w + SearchExportGap;
+        exportStateButton.Left = x;
+        exportStateButton.Top = 118;
+        importStateButton.Left = x + ExportButtonWidth + SearchExportGap;
+        importStateButton.Top = 118;
     }
 
     private void darkModeCheckBox_CheckedChanged(object? sender, EventArgs e)
@@ -260,6 +290,37 @@ public partial class MainForm : Form
                 _allPlanes.Add(row);
             }
 
+            // If the packed state list exists (from a previous Apply, Save and Pack), apply it so state is restored
+            var stateJsonPath = Path.Combine(Path.GetDirectoryName(assetPath) ?? unpackDir, "DisableEnabler_plane_states.json");
+            if (File.Exists(stateJsonPath))
+            {
+                try
+                {
+                    var stateJson = File.ReadAllText(stateJsonPath);
+                    var entries = JsonConvert.DeserializeObject<List<PlaneStateExportEntry>>(stateJson);
+                    if (entries != null && entries.Count > 0)
+                    {
+                        var byId = entries.ToDictionary(e => e.PlaneStringID, e => e, StringComparer.OrdinalIgnoreCase);
+                        var updated = 0;
+                        foreach (var plane in _allPlanes)
+                        {
+                            if (byId.TryGetValue(plane.PlaneStringID, out var entry))
+                            {
+                                plane.Enabled = entry.Enabled;
+                                if (!string.IsNullOrEmpty(entry.OriginalDLCID))
+                                    plane.DLCID = entry.OriginalDLCID;
+                                updated++;
+                            }
+                        }
+                        Log($"Applied packed state from DisableEnabler_plane_states.json ({updated} planes).");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log($"Could not apply packed state: {ex.Message}");
+                }
+            }
+
             ApplyPlaneFilters();
 
             Log($"Loaded {rows.Count} planes from {jsonPath}");
@@ -298,10 +359,48 @@ public partial class MainForm : Form
                 Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
 
             var assetPath = PlaneDataService.FindPlayerPlaneDataTable(unpackDir);
-            var jsonPath = Path.Combine(Path.GetDirectoryName(assetPath) ?? string.Empty, "PlayerPlaneDataTable.json");
+            var assetDir = Path.GetDirectoryName(assetPath) ?? unpackDir;
+            var jsonPath = Path.Combine(assetDir, "PlayerPlaneDataTable.json");
 
-            PlaneDataService.ApplyEnableFlagsToJson(jsonPath, _allPlanes, Log);
+            var stateJsonPath = Path.Combine(assetDir, "DisableEnabler_plane_states.json");
+            var originalDlcIds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (File.Exists(stateJsonPath))
+            {
+                try
+                {
+                    var stateJson = File.ReadAllText(stateJsonPath);
+                    var stateEntries = JsonConvert.DeserializeObject<List<PlaneStateExportEntry>>(stateJson);
+                    if (stateEntries != null)
+                        foreach (var e in stateEntries.Where(e => !string.IsNullOrEmpty(e.OriginalDLCID)))
+                            originalDlcIds[e.PlaneStringID] = e.OriginalDLCID!;
+                }
+                catch (Exception ex)
+                {
+                    Log($"Could not load state JSON for original DLCIDs: {ex.Message}");
+                }
+            }
+            foreach (var p in _allPlanes)
+            {
+                if (!string.IsNullOrEmpty(p.DLCID) && !originalDlcIds.ContainsKey(p.PlaneStringID))
+                    originalDlcIds[p.PlaneStringID] = p.DLCID;
+            }
+
+            PlaneDataService.ApplyEnableFlagsToJson(jsonPath, _allPlanes, originalDlcIds, Log);
             PlaneDataService.SaveJsonBackToUAsset(assetPath, jsonPath, Log);
+
+            // Save the same importable state JSON into the unpack folder so it gets packed and can be re-imported after unpack.
+            var entriesToSave = _allPlanes
+                .Select(p => new PlaneStateExportEntry
+                {
+                    PlaneStringID = p.PlaneStringID,
+                    Enabled = p.Enabled,
+                    OriginalDLCID = string.IsNullOrEmpty(p.DLCID) ? null : p.DLCID
+                })
+                .ToList();
+            var jsonToWrite = JsonConvert.SerializeObject(entriesToSave, Formatting.Indented);
+            File.WriteAllText(stateJsonPath, jsonToWrite);
+            Log($"Saved plane state list to {stateJsonPath}");
+
             return true;
         }
         catch (Exception ex)
@@ -345,11 +444,16 @@ public partial class MainForm : Form
                 Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
 
             var baseNameWithoutSuffix = pakNameWithoutExtension[..^2]; // remove trailing "_P"
-            var outputFileName = $"{baseNameWithoutSuffix}_DisableEnabler_P.pak";
+            // If the mod is already a DisableEnabler output, don't add the suffix again
+            var outputFileName = baseNameWithoutSuffix.EndsWith("_DisableEnabler", StringComparison.OrdinalIgnoreCase)
+                ? $"{baseNameWithoutSuffix}_P.pak"
+                : $"{baseNameWithoutSuffix}_DisableEnabler_P.pak";
             var outputPakPath = Path.Combine(Path.GetDirectoryName(pakPath) ?? string.Empty, outputFileName);
 
             const string internalPath = "../../../Nimbus/Content/Blueprint/Information/PlayerPlaneDataTable.uasset";
-            PakService.CreatePak(unrealPakPath, unpackDir, outputPakPath, internalPath, Log);
+            var assetPath = PlaneDataService.FindPlayerPlaneDataTable(unpackDir);
+            var stateJsonPath = Path.Combine(Path.GetDirectoryName(assetPath) ?? unpackDir, "DisableEnabler_plane_states.json");
+            PakService.CreatePak(unrealPakPath, unpackDir, outputPakPath, internalPath, stateJsonPath, Log);
 
             Log($"Packed new PAK at {outputPakPath}");
             return true;
@@ -359,6 +463,96 @@ public partial class MainForm : Form
             Log($"Error during Pack PAK: {ex.Message}");
             MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return false;
+        }
+    }
+
+    private void exportStateButton_Click(object? sender, EventArgs e)
+    {
+        if (_allPlanes.Count == 0)
+        {
+            MessageBox.Show(this, "Load plane data first (Unpack & Load).", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        using var sfd = new SaveFileDialog
+        {
+            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+            DefaultExt = "json",
+            FileName = "DisableEnabler_plane_states.json"
+        };
+        if (sfd.ShowDialog(this) != DialogResult.OK)
+            return;
+
+        try
+        {
+            var entries = _allPlanes
+                .Select(p => new PlaneStateExportEntry
+                {
+                    PlaneStringID = p.PlaneStringID,
+                    Enabled = p.Enabled,
+                    OriginalDLCID = string.IsNullOrEmpty(p.DLCID) ? null : p.DLCID
+                })
+                .ToList();
+            var json = JsonConvert.SerializeObject(entries, Formatting.Indented);
+            File.WriteAllText(sfd.FileName, json);
+            Log($"Exported {entries.Count} plane states to {sfd.FileName}");
+            MessageBox.Show(this, $"Exported {entries.Count} plane states.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            Log($"Export failed: {ex.Message}");
+            MessageBox.Show(this, ex.Message, "Export failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void importStateButton_Click(object? sender, EventArgs e)
+    {
+        if (_allPlanes.Count == 0)
+        {
+            MessageBox.Show(this, "Load plane data first (Unpack & Load).", "Import", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        using var ofd = new OpenFileDialog
+        {
+            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+            CheckFileExists = true
+        };
+        if (ofd.ShowDialog(this) != DialogResult.OK)
+            return;
+
+        try
+        {
+            var json = File.ReadAllText(ofd.FileName);
+            var entries = JsonConvert.DeserializeObject<List<PlaneStateExportEntry>>(json);
+            if (entries == null || entries.Count == 0)
+            {
+                MessageBox.Show(this, "No entries in file or invalid format.", "Import", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var byId = entries.ToDictionary(e => e.PlaneStringID, e => e, StringComparer.OrdinalIgnoreCase);
+            var updated = 0;
+            foreach (var plane in _allPlanes)
+            {
+                if (byId.TryGetValue(plane.PlaneStringID, out var entry))
+                {
+                    plane.Enabled = entry.Enabled;
+                    if (!string.IsNullOrEmpty(entry.OriginalDLCID))
+                        plane.DLCID = entry.OriginalDLCID;
+                    updated++;
+                }
+            }
+
+            ApplyPlaneFilters();
+            planesGrid.Refresh();
+            Log($"Imported plane states from {ofd.FileName}; updated {updated} of {_allPlanes.Count} planes.");
+            MessageBox.Show(this, $"Updated {updated} plane(s) from import.", "Import", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            Log($"Import failed: {ex.Message}");
+            MessageBox.Show(this, ex.Message, "Import failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 

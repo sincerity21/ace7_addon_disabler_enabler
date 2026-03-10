@@ -12,6 +12,8 @@ public partial class MainForm
     private Button unpackAndLoadButton = null!;
     private Button applyAndSaveButton = null!;
     private Button openOutputFolderButton = null!;
+    private Button exportStateButton = null!;
+    private Button importStateButton = null!;
     private CheckBox hideBaseGameCheckBox = null!;
     private CheckBox hideVrPlanesCheckBox = null!;
     private TextBox searchTextBox = null!;
@@ -28,6 +30,8 @@ public partial class MainForm
         this.unpackAndLoadButton = new Button();
         this.applyAndSaveButton = new Button();
         this.openOutputFolderButton = new Button();
+        this.exportStateButton = new Button();
+        this.importStateButton = new Button();
         this.hideBaseGameCheckBox = new CheckBox();
         this.hideVrPlanesCheckBox = new CheckBox();
         this.searchTextBox = new TextBox();
@@ -90,10 +94,26 @@ public partial class MainForm
         this.openOutputFolderButton.Text = "Open Output Folder";
         this.openOutputFolderButton.Click += this.openOutputFolderButton_Click;
 
+        // exportStateButton (position set in layout to sit immediately right of search bar)
+        this.exportStateButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+        this.exportStateButton.FlatStyle = FlatStyle.Flat;
+        this.exportStateButton.Location = new System.Drawing.Point(428, 118);
+        this.exportStateButton.Size = new System.Drawing.Size(90, 26);
+        this.exportStateButton.Text = "Export state…";
+        this.exportStateButton.Click += this.exportStateButton_Click;
+
+        // importStateButton (position set in layout to sit immediately right of search bar)
+        this.importStateButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+        this.importStateButton.FlatStyle = FlatStyle.Flat;
+        this.importStateButton.Location = new System.Drawing.Point(514, 118);
+        this.importStateButton.Size = new System.Drawing.Size(92, 26);
+        this.importStateButton.Text = "Import state…";
+        this.importStateButton.Click += this.importStateButton_Click;
+
         // hideBaseGameCheckBox
         this.hideBaseGameCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         this.hideBaseGameCheckBox.AutoSize = true;
-        this.hideBaseGameCheckBox.Location = new System.Drawing.Point(526, 84);
+        this.hideBaseGameCheckBox.Location = new System.Drawing.Point(526, 76);
         this.hideBaseGameCheckBox.Text = "Hide Base Game";
         this.hideBaseGameCheckBox.Checked = true;
         this.hideBaseGameCheckBox.CheckState = CheckState.Checked;
@@ -102,7 +122,7 @@ public partial class MainForm
         // hideVrPlanesCheckBox
         this.hideVrPlanesCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         this.hideVrPlanesCheckBox.AutoSize = true;
-        this.hideVrPlanesCheckBox.Location = new System.Drawing.Point(526, 108);
+        this.hideVrPlanesCheckBox.Location = new System.Drawing.Point(526, 96);
         this.hideVrPlanesCheckBox.Text = "Hide VR Planes";
         this.hideVrPlanesCheckBox.Checked = true;
         this.hideVrPlanesCheckBox.CheckState = CheckState.Checked;
@@ -111,15 +131,15 @@ public partial class MainForm
         // darkModeCheckBox
         this.darkModeCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         this.darkModeCheckBox.AutoSize = true;
-        this.darkModeCheckBox.Location = new System.Drawing.Point(430, 86);
+        this.darkModeCheckBox.Location = new System.Drawing.Point(430, 78);
         this.darkModeCheckBox.Text = "Dark mode";
         this.darkModeCheckBox.CheckedChanged += this.darkModeCheckBox_CheckedChanged;
 
-        // searchTextBox
+        // searchTextBox (width updated on resize so Export/Import stay to the right)
         this.searchTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         this.searchTextBox.BorderStyle = BorderStyle.FixedSingle;
         this.searchTextBox.Location = new System.Drawing.Point(12, 118);
-        this.searchTextBox.Size = new System.Drawing.Size(508, 24);
+        this.searchTextBox.Size = new System.Drawing.Size(400, 24);
         this.searchTextBox.PlaceholderText = "Search PlaneStringID or PlaneID";
         this.searchTextBox.TextChanged += this.searchTextBox_TextChanged;
 
@@ -193,6 +213,8 @@ public partial class MainForm
         this.Controls.Add(this.unpackAndLoadButton);
         this.Controls.Add(this.applyAndSaveButton);
         this.Controls.Add(this.openOutputFolderButton);
+        this.Controls.Add(this.exportStateButton);
+        this.Controls.Add(this.importStateButton);
         this.Controls.Add(this.hideBaseGameCheckBox);
         this.Controls.Add(this.hideVrPlanesCheckBox);
         this.Controls.Add(this.darkModeCheckBox);

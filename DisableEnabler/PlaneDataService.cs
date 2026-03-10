@@ -56,6 +56,8 @@ public static class PlaneDataService
 
             var planeNumericId = -1;
             var originalPlaneId = -1;
+            var targetMode = string.Empty;
+            var dlcId = string.Empty;
             var parentArray = obj.Parent as JArray;
             if (parentArray != null)
             {
@@ -77,20 +79,30 @@ public static class PlaneDataService
                         {
                             originalPlaneId = parsedId;
                         }
-
-                        break;
+                    }
+                    else if (string.Equals(name, "TargetMode", StringComparison.Ordinal))
+                    {
+                        targetMode = sibling["Value"]?.ToString() ?? string.Empty;
+                    }
+                    else if (string.Equals(name, "DLCID", StringComparison.Ordinal))
+                    {
+                        dlcId = sibling["Value"]?.ToString() ?? string.Empty;
                     }
                 }
             }
 
             if (rows.All(r => r.PlaneStringID != planeId))
             {
+                var isDisabledInAsset = string.Equals(targetMode, "EPlaneTargetMode::None", StringComparison.Ordinal)
+                    && string.Equals(dlcId, "DummyId", StringComparison.Ordinal);
                 rows.Add(new PlaneDataRow
                 {
                     PlaneStringID = planeId,
-                    Enabled = true,
+                    Enabled = !isDisabledInAsset,
                     PlaneID = planeNumericId,
-                    OriginalPlaneID = originalPlaneId
+                    OriginalPlaneID = originalPlaneId,
+                    TargetMode = targetMode,
+                    DLCID = dlcId
                 });
             }
         }
@@ -99,12 +111,15 @@ public static class PlaneDataService
         return rows;
     }
 
-    public static void ApplyEnableFlagsToJson(string jsonPath, IEnumerable<PlaneDataRow> rows, Action<string> log)
+    /// <param name="originalDlcIds">Optional map of PlaneStringID to DLCID to restore when re-enabling (e.g. from DisableEnabler_plane_states.json). If null or missing key, falls back to current row DLCID.</param>
+    public static void ApplyEnableFlagsToJson(string jsonPath, IEnumerable<PlaneDataRow> rows, IReadOnlyDictionary<string, string>? originalDlcIds, Action<string> log)
     {
         var text = File.ReadAllText(jsonPath);
         var root = JObject.Parse(text);
 
-        var byId = rows.ToDictionary(r => r.PlaneStringID, r => r.Enabled);
+        var rowsList = rows.ToList();
+        var byId = rowsList.ToDictionary(r => r.PlaneStringID, r => r.Enabled);
+        var dlcById = rowsList.ToDictionary(r => r.PlaneStringID, r => r.DLCID, StringComparer.OrdinalIgnoreCase);
 
         foreach (var rowToken in root.SelectTokens("$..[?(@.Name=='PlaneStringID')]").OfType<JObject>())
         {
@@ -116,7 +131,14 @@ public static class PlaneDataService
             if (!byId.TryGetValue(planeId, out var enabled))
                 continue;
 
-            // For this row, find sibling TargetMode and DLCID and patch them
+            var isVr = planeId.EndsWith("_vr", StringComparison.OrdinalIgnoreCase);
+            var targetModeValue = enabled
+                ? (isVr ? "EPlaneTargetMode::VR" : "EPlaneTargetMode::CampaignAndOnline")
+                : "EPlaneTargetMode::None";
+            var dlcIdValue = enabled
+                ? (originalDlcIds != null && originalDlcIds.TryGetValue(planeId, out var saved) ? saved : (dlcById.TryGetValue(planeId, out var current) ? current : string.Empty))
+                : "DummyId";
+
             var parentArray = rowToken.Parent as JArray;
             if (parentArray == null)
                 continue;
@@ -126,17 +148,11 @@ public static class PlaneDataService
                 var name = sibling["Name"]?.ToString();
                 if (string.Equals(name, "TargetMode", StringComparison.Ordinal))
                 {
-                    if (!enabled)
-                    {
-                        sibling["Value"] = "EPlaneTargetMode::None";
-                    }
+                    sibling["Value"] = targetModeValue;
                 }
                 else if (string.Equals(name, "DLCID", StringComparison.Ordinal))
                 {
-                    if (!enabled)
-                    {
-                        sibling["Value"] = "DummyId";
-                    }
+                    sibling["Value"] = dlcIdValue;
                 }
             }
         }
@@ -149,33 +165,35 @@ public static class PlaneDataService
     {
         var jsonText = File.ReadAllText(jsonPath);
 
-        // Ensure the NameMap contains EPlaneTargetMode::None so that any uses
-        // of this enum value are backed by a real FName instead of a dummy.
+        // Ensure the NameMap contains TargetMode enum values we write when applying (None, VR, CampaignAndOnline).
         try
         {
             var root = JObject.Parse(jsonText);
             if (root["NameMap"] is JArray nameMapArray)
             {
-                var hasNone = nameMapArray
-                    .Values<string>()
-                    .Any(s => string.Equals(s, "EPlaneTargetMode::None", StringComparison.Ordinal));
-
-                if (!hasNone)
+                var existing = new HashSet<string>(nameMapArray.Values<string>().OfType<string>(), StringComparer.Ordinal);
+                var toAdd = new[] { "EPlaneTargetMode::None", "EPlaneTargetMode::VR", "EPlaneTargetMode::CampaignAndOnline" };
+                var added = false;
+                foreach (var name in toAdd)
                 {
-                    nameMapArray.Add("EPlaneTargetMode::None");
+                    if (!existing.Contains(name))
+                    {
+                        nameMapArray.Add(name);
+                        existing.Add(name);
+                        added = true;
+                    }
+                }
+                if (added)
+                {
                     jsonText = root.ToString();
-
-                    // Persist the updated NameMap to the JSON on disk so that
-                    // both the .uasset and the exported JSON stay in sync.
                     File.WriteAllText(jsonPath, jsonText);
-
-                    log("Added EPlaneTargetMode::None to NameMap in JSON and UAsset.");
+                    log("Added TargetMode enum value(s) to NameMap in JSON and UAsset.");
                 }
             }
         }
         catch (Exception)
         {
-            log("Warning: Failed to add EPlaneTargetMode::None to NameMap; proceeding without modification.");
+            log("Warning: Failed to add TargetMode enum values to NameMap; proceeding without modification.");
         }
 
         var asset = UAsset.DeserializeJson(jsonText);

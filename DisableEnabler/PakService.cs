@@ -42,7 +42,7 @@ public static class PakService
         }
     }
 
-    public static void CreatePak(string unrealPakExe, string sourceDir, string outputPakPath, string internalRelativePath, Action<string> log)
+    public static void CreatePak(string unrealPakExe, string sourceDir, string outputPakPath, string internalRelativePath, string? stateJsonPath, Action<string> log)
     {
         // internalRelativePath is something like "Nimbus/Content/Blueprint/Information/PlayerPlaneDataTable.uasset"
         var fileListFileName = "filelist_disable_enabler.txt";
@@ -84,6 +84,12 @@ public static class PakService
         if (File.Exists(sourceJsonPath))
         {
             sb.AppendLine($"\"{sourceJsonPath}\" \"{internalDir}/{baseName}.json\"");
+        }
+
+        // Include DisableEnabler plane state JSON (same format as Import) so it survives unpack/repack
+        if (!string.IsNullOrEmpty(stateJsonPath) && File.Exists(stateJsonPath))
+        {
+            sb.AppendLine($"\"{stateJsonPath}\" \"{internalDir}/DisableEnabler_plane_states.json\"");
         }
 
         File.WriteAllText(fileListPath, sb.ToString(), Encoding.UTF8);
