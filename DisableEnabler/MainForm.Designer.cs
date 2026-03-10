@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace DisableEnabler;
@@ -39,53 +40,60 @@ public partial class MainForm
 
         // pakPathTextBox
         this.pakPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        this.pakPathTextBox.BorderStyle = BorderStyle.FixedSingle;
         this.pakPathTextBox.Location = new System.Drawing.Point(12, 12);
-        this.pakPathTextBox.Size = new System.Drawing.Size(520, 23);
+        this.pakPathTextBox.Size = new System.Drawing.Size(520, 24);
 
         // browsePakButton
         this.browsePakButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        this.browsePakButton.FlatStyle = FlatStyle.Flat;
         this.browsePakButton.Location = new System.Drawing.Point(538, 11);
-        this.browsePakButton.Size = new System.Drawing.Size(80, 25);
+        this.browsePakButton.Size = new System.Drawing.Size(80, 28);
         this.browsePakButton.Text = "Browse PAK";
         this.browsePakButton.Click += this.browsePakButton_Click;
 
         // unrealPakPathTextBox
         this.unrealPakPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        this.unrealPakPathTextBox.Location = new System.Drawing.Point(12, 43);
-        this.unrealPakPathTextBox.Size = new System.Drawing.Size(520, 23);
+        this.unrealPakPathTextBox.BorderStyle = BorderStyle.FixedSingle;
+        this.unrealPakPathTextBox.Location = new System.Drawing.Point(12, 44);
+        this.unrealPakPathTextBox.Size = new System.Drawing.Size(520, 24);
 
         // browseUnrealPakButton
         this.browseUnrealPakButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        this.browseUnrealPakButton.FlatStyle = FlatStyle.Flat;
         this.browseUnrealPakButton.Location = new System.Drawing.Point(538, 42);
-        this.browseUnrealPakButton.Size = new System.Drawing.Size(80, 25);
+        this.browseUnrealPakButton.Size = new System.Drawing.Size(80, 28);
         this.browseUnrealPakButton.Text = "Browse EXE";
         this.browseUnrealPakButton.Click += this.browseUnrealPakButton_Click;
 
         // unpackAndLoadButton
         this.unpackAndLoadButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.unpackAndLoadButton.Location = new System.Drawing.Point(12, 80);
-        this.unpackAndLoadButton.Size = new System.Drawing.Size(120, 27);
+        this.unpackAndLoadButton.FlatStyle = FlatStyle.Flat;
+        this.unpackAndLoadButton.Location = new System.Drawing.Point(12, 82);
+        this.unpackAndLoadButton.Size = new System.Drawing.Size(120, 28);
         this.unpackAndLoadButton.Text = "Unpack && Load";
         this.unpackAndLoadButton.Click += this.unpackAndLoadButton_Click;
 
         // applyAndSaveButton
         this.applyAndSaveButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.applyAndSaveButton.Location = new System.Drawing.Point(138, 80);
-        this.applyAndSaveButton.Size = new System.Drawing.Size(140, 27);
+        this.applyAndSaveButton.FlatStyle = FlatStyle.Flat;
+        this.applyAndSaveButton.Location = new System.Drawing.Point(138, 82);
+        this.applyAndSaveButton.Size = new System.Drawing.Size(140, 28);
         this.applyAndSaveButton.Text = "Apply, Save && Pack";
         this.applyAndSaveButton.Click += this.applyAndSaveButton_Click;
 
         // openOutputFolderButton
         this.openOutputFolderButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.openOutputFolderButton.Location = new System.Drawing.Point(284, 80);
-        this.openOutputFolderButton.Size = new System.Drawing.Size(140, 27);
+        this.openOutputFolderButton.FlatStyle = FlatStyle.Flat;
+        this.openOutputFolderButton.Location = new System.Drawing.Point(284, 82);
+        this.openOutputFolderButton.Size = new System.Drawing.Size(140, 28);
         this.openOutputFolderButton.Text = "Open Output Folder";
         this.openOutputFolderButton.Click += this.openOutputFolderButton_Click;
 
         // hideBaseGameCheckBox
         this.hideBaseGameCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         this.hideBaseGameCheckBox.AutoSize = true;
-        this.hideBaseGameCheckBox.Location = new System.Drawing.Point(526, 80);
+        this.hideBaseGameCheckBox.Location = new System.Drawing.Point(526, 84);
         this.hideBaseGameCheckBox.Text = "Hide Base Game";
         this.hideBaseGameCheckBox.Checked = true;
         this.hideBaseGameCheckBox.CheckState = CheckState.Checked;
@@ -94,7 +102,7 @@ public partial class MainForm
         // hideVrPlanesCheckBox
         this.hideVrPlanesCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         this.hideVrPlanesCheckBox.AutoSize = true;
-        this.hideVrPlanesCheckBox.Location = new System.Drawing.Point(526, 105);
+        this.hideVrPlanesCheckBox.Location = new System.Drawing.Point(526, 108);
         this.hideVrPlanesCheckBox.Text = "Hide VR Planes";
         this.hideVrPlanesCheckBox.Checked = true;
         this.hideVrPlanesCheckBox.CheckState = CheckState.Checked;
@@ -103,21 +111,24 @@ public partial class MainForm
         // darkModeCheckBox
         this.darkModeCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         this.darkModeCheckBox.AutoSize = true;
-        this.darkModeCheckBox.Location = new System.Drawing.Point(430, 84);
+        this.darkModeCheckBox.Location = new System.Drawing.Point(430, 86);
         this.darkModeCheckBox.Text = "Dark mode";
         this.darkModeCheckBox.CheckedChanged += this.darkModeCheckBox_CheckedChanged;
 
         // searchTextBox
         this.searchTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.searchTextBox.Location = new System.Drawing.Point(12, 108);
-        this.searchTextBox.Size = new System.Drawing.Size(508, 23);
+        this.searchTextBox.BorderStyle = BorderStyle.FixedSingle;
+        this.searchTextBox.Location = new System.Drawing.Point(12, 118);
+        this.searchTextBox.Size = new System.Drawing.Size(508, 24);
         this.searchTextBox.PlaceholderText = "Search PlaneStringID or PlaneID";
         this.searchTextBox.TextChanged += this.searchTextBox_TextChanged;
 
         // planesGrid
         this.planesGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-        this.planesGrid.Location = new System.Drawing.Point(12, 135);
-        this.planesGrid.Size = new System.Drawing.Size(606, 238);
+        this.planesGrid.BorderStyle = BorderStyle.FixedSingle;
+        this.planesGrid.Location = new System.Drawing.Point(12, 148);
+        this.planesGrid.Size = new System.Drawing.Size(606, 225);
+        this.planesGrid.RowTemplate.Height = 24;
         this.planesGrid.AllowUserToAddRows = false;
         this.planesGrid.AllowUserToDeleteRows = false;
         this.planesGrid.AllowUserToResizeRows = false;
@@ -125,6 +136,8 @@ public partial class MainForm
         this.planesGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         this.planesGrid.MultiSelect = true;
         this.planesGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        this.planesGrid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+        this.planesGrid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
 
         var enabledColumn = new DataGridViewCheckBoxColumn
         {
@@ -161,6 +174,7 @@ public partial class MainForm
 
         // logTextBox
         this.logTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        this.logTextBox.BorderStyle = BorderStyle.FixedSingle;
         this.logTextBox.Location = new System.Drawing.Point(12, 379);
         this.logTextBox.Size = new System.Drawing.Size(606, 80);
         this.logTextBox.Multiline = true;
@@ -168,6 +182,7 @@ public partial class MainForm
         this.logTextBox.ReadOnly = true;
 
         // MainForm
+        this.Font = new Font("Segoe UI", 9F);
         this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new System.Drawing.Size(630, 471);

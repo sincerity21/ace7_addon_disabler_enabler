@@ -34,7 +34,7 @@ public partial class MainForm : Form
 
     private void ApplyTheme()
     {
-        var formBackColor = _isDarkMode ? Color.FromArgb(32, 32, 32) : SystemColors.Control;
+        var formBackColor = _isDarkMode ? Color.FromArgb(38, 38, 38) : SystemColors.Control;
         var formForeColor = _isDarkMode ? Color.WhiteSmoke : SystemColors.ControlText;
 
         BackColor = formBackColor;
@@ -54,19 +54,29 @@ public partial class MainForm : Form
         {
             // Handled separately
         }
-        else if (control is TextBox)
+        else         if (control is TextBox)
         {
-            control.BackColor = _isDarkMode ? Color.FromArgb(40, 40, 40) : SystemColors.Window;
+            control.BackColor = _isDarkMode ? Color.FromArgb(45, 45, 45) : Color.FromArgb(252, 252, 252);
             control.ForeColor = _isDarkMode ? Color.WhiteSmoke : SystemColors.WindowText;
         }
-        else if (control is Button or CheckBox)
+        else if (control is Button btn)
+        {
+            btn.BackColor = _isDarkMode ? Color.FromArgb(50, 50, 50) : SystemColors.Control;
+            btn.ForeColor = _isDarkMode ? Color.WhiteSmoke : SystemColors.ControlText;
+            if (btn.FlatStyle == FlatStyle.Flat)
+            {
+                btn.FlatAppearance.BorderColor = _isDarkMode ? Color.FromArgb(70, 70, 70) : SystemColors.ControlDark;
+                btn.FlatAppearance.BorderSize = 1;
+            }
+        }
+        else if (control is CheckBox)
         {
             control.BackColor = _isDarkMode ? Color.FromArgb(45, 45, 45) : SystemColors.Control;
             control.ForeColor = _isDarkMode ? Color.WhiteSmoke : SystemColors.ControlText;
         }
         else
         {
-            control.BackColor = _isDarkMode ? Color.FromArgb(32, 32, 32) : SystemColors.Control;
+            control.BackColor = _isDarkMode ? Color.FromArgb(38, 38, 38) : SystemColors.Control;
             control.ForeColor = _isDarkMode ? Color.WhiteSmoke : SystemColors.ControlText;
         }
 
@@ -80,29 +90,29 @@ public partial class MainForm : Form
     {
         if (_isDarkMode)
         {
-            grid.BackgroundColor = Color.FromArgb(32, 32, 32);
-            grid.GridColor = Color.DimGray;
-            grid.DefaultCellStyle.BackColor = Color.FromArgb(40, 40, 40);
+            grid.BackgroundColor = Color.FromArgb(38, 38, 38);
+            grid.GridColor = Color.FromArgb(60, 60, 60);
+            grid.DefaultCellStyle.BackColor = Color.FromArgb(45, 45, 45);
             grid.DefaultCellStyle.ForeColor = Color.WhiteSmoke;
             grid.DefaultCellStyle.SelectionBackColor = Color.SteelBlue;
             grid.DefaultCellStyle.SelectionForeColor = Color.White;
 
-            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(45, 45, 45);
+            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(50, 50, 50);
             grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.WhiteSmoke;
             grid.EnableHeadersVisualStyles = false;
         }
         else
         {
-            grid.BackgroundColor = SystemColors.Window;
-            grid.GridColor = SystemColors.ControlDark;
+            grid.BackgroundColor = Color.FromArgb(252, 252, 252);
+            grid.GridColor = Color.FromArgb(220, 220, 220);
             grid.DefaultCellStyle.BackColor = SystemColors.Window;
             grid.DefaultCellStyle.ForeColor = SystemColors.ControlText;
             grid.DefaultCellStyle.SelectionBackColor = SystemColors.Highlight;
             grid.DefaultCellStyle.SelectionForeColor = SystemColors.HighlightText;
 
-            grid.ColumnHeadersDefaultCellStyle.BackColor = SystemColors.Control;
+            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240);
             grid.ColumnHeadersDefaultCellStyle.ForeColor = SystemColors.ControlText;
-            grid.EnableHeadersVisualStyles = true;
+            grid.EnableHeadersVisualStyles = false;
         }
     }
 
