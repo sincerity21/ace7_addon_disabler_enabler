@@ -42,7 +42,7 @@ public static class PlaneDataService
     {
         var rows = new List<PlaneDataRow>();
 
-        // Heuristic: walk all string properties named PlaneStringID
+        // Heuristic: walk all string properties named PlaneStringID and capture their PlaneID / OriginalPlaneID
         var tokens = root.SelectTokens("$..[?(@.Name=='PlaneStringID')]");
         foreach (var token in tokens)
         {
@@ -54,12 +54,43 @@ public static class PlaneDataService
             if (string.IsNullOrWhiteSpace(planeId))
                 continue;
 
+            var planeNumericId = -1;
+            var originalPlaneId = -1;
+            var parentArray = obj.Parent as JArray;
+            if (parentArray != null)
+            {
+                foreach (var sibling in parentArray.OfType<JObject>())
+                {
+                    var name = sibling["Name"]?.ToString();
+                    if (string.Equals(name, "PlaneID", StringComparison.Ordinal))
+                    {
+                        var idToken = sibling["Value"];
+                        if (idToken != null && int.TryParse(idToken.ToString(), out var parsedId))
+                        {
+                            planeNumericId = parsedId;
+                        }
+                    }
+                    else if (string.Equals(name, "OriginalPlaneID", StringComparison.Ordinal))
+                    {
+                        var idToken = sibling["Value"];
+                        if (idToken != null && int.TryParse(idToken.ToString(), out var parsedId))
+                        {
+                            originalPlaneId = parsedId;
+                        }
+
+                        break;
+                    }
+                }
+            }
+
             if (rows.All(r => r.PlaneStringID != planeId))
             {
                 rows.Add(new PlaneDataRow
                 {
                     PlaneStringID = planeId,
-                    Enabled = true
+                    Enabled = true,
+                    PlaneID = planeNumericId,
+                    OriginalPlaneID = originalPlaneId
                 });
             }
         }
@@ -117,6 +148,36 @@ public static class PlaneDataService
     public static void SaveJsonBackToUAsset(string assetPath, string jsonPath, Action<string> log)
     {
         var jsonText = File.ReadAllText(jsonPath);
+
+        // Ensure the NameMap contains EPlaneTargetMode::None so that any uses
+        // of this enum value are backed by a real FName instead of a dummy.
+        try
+        {
+            var root = JObject.Parse(jsonText);
+            if (root["NameMap"] is JArray nameMapArray)
+            {
+                var hasNone = nameMapArray
+                    .Values<string>()
+                    .Any(s => string.Equals(s, "EPlaneTargetMode::None", StringComparison.Ordinal));
+
+                if (!hasNone)
+                {
+                    nameMapArray.Add("EPlaneTargetMode::None");
+                    jsonText = root.ToString();
+
+                    // Persist the updated NameMap to the JSON on disk so that
+                    // both the .uasset and the exported JSON stay in sync.
+                    File.WriteAllText(jsonPath, jsonText);
+
+                    log("Added EPlaneTargetMode::None to NameMap in JSON and UAsset.");
+                }
+            }
+        }
+        catch (Exception)
+        {
+            log("Warning: Failed to add EPlaneTargetMode::None to NameMap; proceeding without modification.");
+        }
+
         var asset = UAsset.DeserializeJson(jsonText);
         asset.Write(assetPath);
 

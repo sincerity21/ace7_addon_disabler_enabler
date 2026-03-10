@@ -45,25 +45,58 @@ public static class PakService
     public static void CreatePak(string unrealPakExe, string sourceDir, string outputPakPath, string internalRelativePath, Action<string> log)
     {
         // internalRelativePath is something like "Nimbus/Content/Blueprint/Information/PlayerPlaneDataTable.uasset"
-        var fileListPath = Path.Combine(sourceDir, "filelist_disable_enabler.txt");
-        var sourceAssetPath = Path.Combine(sourceDir, "PlayerPlaneDataTable.uasset");
-
-        if (!File.Exists(sourceAssetPath))
+        var fileListFileName = "filelist_disable_enabler.txt";
+        var unrealPakDir = Path.GetDirectoryName(unrealPakExe) ?? string.Empty;
+        if (string.IsNullOrEmpty(unrealPakDir))
         {
-            throw new FileNotFoundException("Modified PlayerPlaneDataTable.uasset not found in sourceDir.", sourceAssetPath);
+            throw new InvalidOperationException("Could not determine UnrealPak.exe directory.");
+        }
+        var fileListPath = Path.Combine(unrealPakDir, fileListFileName);
+
+        // Expect the three related files in sourceDir
+        var baseName = Path.GetFileNameWithoutExtension(internalRelativePath);
+        var internalDir = Path.GetDirectoryName(internalRelativePath)?.Replace('\\', '/') ?? string.Empty;
+        if (string.IsNullOrEmpty(internalDir))
+        {
+            throw new InvalidOperationException("internalRelativePath must include a directory path.");
         }
 
-        var line = $"\"{sourceAssetPath}\" \"{internalRelativePath}\"";
-        File.WriteAllText(fileListPath, line, Encoding.UTF8);
-        log($"Created file list at {fileListPath} with mapping: {line}");
+        var sourceUassetPath = Path.Combine(sourceDir, $"{baseName}.uasset");
+        if (!File.Exists(sourceUassetPath))
+        {
+            throw new FileNotFoundException("Modified PlayerPlaneDataTable.uasset not found in sourceDir.", sourceUassetPath);
+        }
 
-        var args = $"\"{outputPakPath}\" -create=\"{fileListPath}\"";
+        var sourceUexpPath = Path.Combine(sourceDir, $"{baseName}.uexp");
+        var sourceJsonPath = Path.Combine(sourceDir, $"{baseName}.json");
+
+        var sb = new StringBuilder();
+        // Always include .uasset
+        sb.AppendLine($"\"{sourceUassetPath}\" \"{internalDir}/{baseName}.uasset\"");
+
+        // Include .uexp if present
+        if (File.Exists(sourceUexpPath))
+        {
+            sb.AppendLine($"\"{sourceUexpPath}\" \"{internalDir}/{baseName}.uexp\"");
+        }
+
+        // Include .json if present
+        if (File.Exists(sourceJsonPath))
+        {
+            sb.AppendLine($"\"{sourceJsonPath}\" \"{internalDir}/{baseName}.json\"");
+        }
+
+        File.WriteAllText(fileListPath, sb.ToString(), Encoding.UTF8);
+        log($"Created file list at {fileListPath} for base '{baseName}' in '{internalDir}'");
+
+        var args = $"\"{outputPakPath}\" -create={fileListFileName}";
         log($"Running UnrealPak create: {unrealPakExe} {args}");
 
         var psi = new ProcessStartInfo
         {
             FileName = unrealPakExe,
             Arguments = args,
+            WorkingDirectory = unrealPakDir,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
