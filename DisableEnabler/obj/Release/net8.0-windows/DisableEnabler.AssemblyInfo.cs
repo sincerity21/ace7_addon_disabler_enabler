@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DisableEnabler")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b4861a204fcdc4bf7a2df5e1f89432b54113afbf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f355b6313e4b16275a2dca27c9062b8ae07375a4")]
 [assembly: System.Reflection.AssemblyProductAttribute("DisableEnabler")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DisableEnabler")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
