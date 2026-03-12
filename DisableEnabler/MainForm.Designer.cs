@@ -6,14 +6,12 @@ namespace DisableEnabler;
 public partial class MainForm
 {
     private TextBox pakPathTextBox = null!;
-    private Button browsePakButton = null!;
+    private Button scanModsFolderButton = null!;
     private TextBox unrealPakPathTextBox = null!;
     private Button browseUnrealPakButton = null!;
     private Button unpackAndLoadButton = null!;
     private Button applyAndSaveButton = null!;
     private Button openOutputFolderButton = null!;
-    private Button exportStateButton = null!;
-    private Button importStateButton = null!;
     private CheckBox hideBaseGameCheckBox = null!;
     private CheckBox hideVrPlanesCheckBox = null!;
     private TextBox searchTextBox = null!;
@@ -24,14 +22,12 @@ public partial class MainForm
     private void InitializeComponent()
     {
         this.pakPathTextBox = new TextBox();
-        this.browsePakButton = new Button();
+        this.scanModsFolderButton = new Button();
         this.unrealPakPathTextBox = new TextBox();
         this.browseUnrealPakButton = new Button();
         this.unpackAndLoadButton = new Button();
         this.applyAndSaveButton = new Button();
         this.openOutputFolderButton = new Button();
-        this.exportStateButton = new Button();
-        this.importStateButton = new Button();
         this.hideBaseGameCheckBox = new CheckBox();
         this.hideVrPlanesCheckBox = new CheckBox();
         this.searchTextBox = new TextBox();
@@ -46,27 +42,27 @@ public partial class MainForm
         this.pakPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         this.pakPathTextBox.BorderStyle = BorderStyle.FixedSingle;
         this.pakPathTextBox.Location = new System.Drawing.Point(12, 12);
-        this.pakPathTextBox.Size = new System.Drawing.Size(520, 24);
+        this.pakPathTextBox.Size = new System.Drawing.Size(508, 24);
 
-        // browsePakButton
-        this.browsePakButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-        this.browsePakButton.FlatStyle = FlatStyle.Flat;
-        this.browsePakButton.Location = new System.Drawing.Point(538, 11);
-        this.browsePakButton.Size = new System.Drawing.Size(80, 28);
-        this.browsePakButton.Text = "Browse PAK";
-        this.browsePakButton.Click += this.browsePakButton_Click;
+        // scanModsFolderButton
+        this.scanModsFolderButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        this.scanModsFolderButton.FlatStyle = FlatStyle.Flat;
+        this.scanModsFolderButton.Location = new System.Drawing.Point(528, 11);
+        this.scanModsFolderButton.Size = new System.Drawing.Size(90, 28);
+        this.scanModsFolderButton.Text = "Choose PAK";
+        this.scanModsFolderButton.Click += this.scanModsFolderButton_Click;
 
         // unrealPakPathTextBox
         this.unrealPakPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         this.unrealPakPathTextBox.BorderStyle = BorderStyle.FixedSingle;
         this.unrealPakPathTextBox.Location = new System.Drawing.Point(12, 44);
-        this.unrealPakPathTextBox.Size = new System.Drawing.Size(520, 24);
+        this.unrealPakPathTextBox.Size = new System.Drawing.Size(508, 24);
 
         // browseUnrealPakButton
         this.browseUnrealPakButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
         this.browseUnrealPakButton.FlatStyle = FlatStyle.Flat;
-        this.browseUnrealPakButton.Location = new System.Drawing.Point(538, 42);
-        this.browseUnrealPakButton.Size = new System.Drawing.Size(80, 28);
+        this.browseUnrealPakButton.Location = new System.Drawing.Point(528, 42);
+        this.browseUnrealPakButton.Size = new System.Drawing.Size(90, 28);
         this.browseUnrealPakButton.Text = "Browse EXE";
         this.browseUnrealPakButton.Click += this.browseUnrealPakButton_Click;
 
@@ -93,22 +89,6 @@ public partial class MainForm
         this.openOutputFolderButton.Size = new System.Drawing.Size(140, 28);
         this.openOutputFolderButton.Text = "Open Output Folder";
         this.openOutputFolderButton.Click += this.openOutputFolderButton_Click;
-
-        // exportStateButton (position set in layout to sit immediately right of search bar)
-        this.exportStateButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.exportStateButton.FlatStyle = FlatStyle.Flat;
-        this.exportStateButton.Location = new System.Drawing.Point(428, 118);
-        this.exportStateButton.Size = new System.Drawing.Size(90, 26);
-        this.exportStateButton.Text = "Export state…";
-        this.exportStateButton.Click += this.exportStateButton_Click;
-
-        // importStateButton (position set in layout to sit immediately right of search bar)
-        this.importStateButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.importStateButton.FlatStyle = FlatStyle.Flat;
-        this.importStateButton.Location = new System.Drawing.Point(514, 118);
-        this.importStateButton.Size = new System.Drawing.Size(92, 26);
-        this.importStateButton.Text = "Import state…";
-        this.importStateButton.Click += this.importStateButton_Click;
 
         // hideBaseGameCheckBox
         this.hideBaseGameCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -139,7 +119,7 @@ public partial class MainForm
         this.searchTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         this.searchTextBox.BorderStyle = BorderStyle.FixedSingle;
         this.searchTextBox.Location = new System.Drawing.Point(12, 118);
-        this.searchTextBox.Size = new System.Drawing.Size(400, 24);
+        this.searchTextBox.Size = new System.Drawing.Size(508, 24);
         this.searchTextBox.PlaceholderText = "Search PlaneStringID or PlaneID";
         this.searchTextBox.TextChanged += this.searchTextBox_TextChanged;
 
@@ -207,14 +187,12 @@ public partial class MainForm
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new System.Drawing.Size(630, 471);
         this.Controls.Add(this.pakPathTextBox);
-        this.Controls.Add(this.browsePakButton);
+        this.Controls.Add(this.scanModsFolderButton);
         this.Controls.Add(this.unrealPakPathTextBox);
         this.Controls.Add(this.browseUnrealPakButton);
         this.Controls.Add(this.unpackAndLoadButton);
         this.Controls.Add(this.applyAndSaveButton);
         this.Controls.Add(this.openOutputFolderButton);
-        this.Controls.Add(this.exportStateButton);
-        this.Controls.Add(this.importStateButton);
         this.Controls.Add(this.hideBaseGameCheckBox);
         this.Controls.Add(this.hideVrPlanesCheckBox);
         this.Controls.Add(this.darkModeCheckBox);

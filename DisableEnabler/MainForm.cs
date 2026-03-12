@@ -19,13 +19,6 @@ public partial class MainForm : Form
     private static readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DisableEnabler.config");
     private bool _isDarkMode;
 
-    /// <summary>Max search bar width so it stops at the toggles (left edge of Dark mode / Hide Base Game).</summary>
-    private const int SearchBarMaxWidth = 430 - 12 - 8; // toggle area starts at 430, left margin 12, gap 8
-    private const int SearchBarLeft = 12;
-    private const int SearchExportGap = 8;
-    private const int ExportButtonWidth = 90;
-    private const int ImportButtonWidth = 92;
-
     public MainForm()
     {
         InitializeComponent();
@@ -33,27 +26,6 @@ public partial class MainForm : Form
         planesGrid.DataSource = _planes;
         LoadConfig();
         ApplyTheme();
-        Resize += MainForm_Resize;
-        LayoutSearchAndExportImport();
-    }
-
-    private void MainForm_Resize(object? sender, EventArgs e)
-    {
-        LayoutSearchAndExportImport();
-    }
-
-    private void LayoutSearchAndExportImport()
-    {
-        var rightReserved = SearchExportGap + ExportButtonWidth + SearchExportGap + ImportButtonWidth;
-        var w = Math.Min(ClientSize.Width - SearchBarLeft - rightReserved - 12, SearchBarMaxWidth); // don't extend past toggles
-        if (w < 80) w = 80;
-        searchTextBox.Width = w;
-        searchTextBox.Left = SearchBarLeft;
-        var x = SearchBarLeft + w + SearchExportGap;
-        exportStateButton.Left = x;
-        exportStateButton.Top = 118;
-        importStateButton.Left = x + ExportButtonWidth + SearchExportGap;
-        importStateButton.Top = 118;
     }
 
     private void darkModeCheckBox_CheckedChanged(object? sender, EventArgs e)
@@ -226,17 +198,59 @@ public partial class MainForm : Form
         _selectedRowIndexes.Clear();
     }
 
-    private void browsePakButton_Click(object? sender, EventArgs e)
+    private void scanModsFolderButton_Click(object? sender, EventArgs e)
     {
-        using var ofd = new OpenFileDialog
+        try
         {
-            Filter = "Pak files (*.pak)|*.pak|All files (*.*)|*.*",
-            CheckFileExists = true
-        };
-        if (ofd.ShowDialog(this) == DialogResult.OK)
+            var unrealPakPath = unrealPakPathTextBox.Text;
+            if (string.IsNullOrWhiteSpace(unrealPakPath) || !File.Exists(unrealPakPath))
+            {
+                MessageBox.Show(this, "Select a valid UnrealPak.exe first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            using var fbd = new FolderBrowserDialog
+            {
+                Description = "Select a folder that contains PAK file(s)",
+                UseDescriptionForTitle = true,
+                ShowNewFolderButton = false
+            };
+
+            if (fbd.ShowDialog(this) != DialogResult.OK || string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                return;
+
+            var chosenFolder = fbd.SelectedPath;
+            Log($"Choosing PAK from folder: {chosenFolder}");
+
+            string? winningPak;
+            try
+            {
+                winningPak = PakService.FindWinningPlanePakInFolder(unrealPakPath, chosenFolder, Log);
+            }
+            catch (Exception ex)
+            {
+                Log($"Error while choosing PAK: {ex.Message}");
+                MessageBox.Show(this, ex.Message, "Choose PAK failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(winningPak))
+            {
+                MessageBox.Show(this,
+                    "No PAKs with PlayerPlaneDataTable.uasset were found in the selected folder.",
+                    "No matching PAK",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            pakPathTextBox.Text = winningPak;
+            Log($"Using winning plane PAK: {winningPak}. You can now click \"Unpack && Load\".");
+        }
+        catch (Exception ex)
         {
-            pakPathTextBox.Text = ofd.FileName;
-            Log($"Selected PAK: {ofd.FileName}");
+            Log($"Unexpected error during Choose PAK: {ex.Message}");
+            MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -274,8 +288,8 @@ public partial class MainForm : Form
                 return;
             }
 
-            var unpackDir = Path.Combine(Path.GetDirectoryName(pakPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var unpackDir = Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
 
             PakService.ExtractPak(unrealPakPath, pakPath, unpackDir, Log);
 
@@ -355,8 +369,8 @@ public partial class MainForm : Form
                 return false;
             }
 
-            var unpackDir = Path.Combine(Path.GetDirectoryName(pakPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var unpackDir = Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
 
             var assetPath = PlaneDataService.FindPlayerPlaneDataTable(unpackDir);
             var assetDir = Path.GetDirectoryName(assetPath) ?? unpackDir;
@@ -440,20 +454,31 @@ public partial class MainForm : Form
                 return false;
             }
 
-            var unpackDir = Path.Combine(Path.GetDirectoryName(pakPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
-
             var baseNameWithoutSuffix = pakNameWithoutExtension[..^2]; // remove trailing "_P"
             // If the mod is already a DisableEnabler output, don't add the suffix again
             var outputFileName = baseNameWithoutSuffix.EndsWith("_DisableEnabler", StringComparison.OrdinalIgnoreCase)
                 ? $"{baseNameWithoutSuffix}_P.pak"
                 : $"{baseNameWithoutSuffix}_DisableEnabler_P.pak";
-            var outputPakPath = Path.Combine(Path.GetDirectoryName(pakPath) ?? string.Empty, outputFileName);
 
-            const string internalPath = "../../../Nimbus/Content/Blueprint/Information/PlayerPlaneDataTable.uasset";
+            // If the chosen PAK name already has leading tildes, add 5 more so
+            // the generated output wins load-order priority over the original.
+            var hasLeadingTildes = !string.IsNullOrEmpty(pakNameWithoutExtension) && pakNameWithoutExtension[0] == '~';
+            var isAlreadyDisableEnabler = baseNameWithoutSuffix.EndsWith("_DisableEnabler", StringComparison.OrdinalIgnoreCase);
+            if (hasLeadingTildes && !isAlreadyDisableEnabler)
+            {
+                outputFileName = new string('~', 5) + outputFileName;
+            }
+            // Place the packed PAK inside the program's unpack folder alongside the extracted files.
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var unpackDir = Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
+            var outputPakPath = Path.Combine(unpackDir, outputFileName);
+
             var assetPath = PlaneDataService.FindPlayerPlaneDataTable(unpackDir);
-            var stateJsonPath = Path.Combine(Path.GetDirectoryName(assetPath) ?? unpackDir, "DisableEnabler_plane_states.json");
-            PakService.CreatePak(unrealPakPath, unpackDir, outputPakPath, internalPath, stateJsonPath, Log);
+            var assetDir = Path.GetDirectoryName(assetPath) ?? unpackDir;
+            var stateJsonPath = Path.Combine(assetDir, "DisableEnabler_plane_states.json");
+            // Use the original internal path that matches stock AC7 layouts
+            const string internalPath = "../../../Nimbus/Content/Blueprint/Information/PlayerPlaneDataTable.uasset";
+            PakService.CreatePak(unrealPakPath, assetDir, outputPakPath, internalPath, stateJsonPath, Log);
 
             Log($"Packed new PAK at {outputPakPath}");
             return true;
@@ -466,96 +491,6 @@ public partial class MainForm : Form
         }
     }
 
-    private void exportStateButton_Click(object? sender, EventArgs e)
-    {
-        if (_allPlanes.Count == 0)
-        {
-            MessageBox.Show(this, "Load plane data first (Unpack & Load).", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            return;
-        }
-
-        using var sfd = new SaveFileDialog
-        {
-            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-            DefaultExt = "json",
-            FileName = "DisableEnabler_plane_states.json"
-        };
-        if (sfd.ShowDialog(this) != DialogResult.OK)
-            return;
-
-        try
-        {
-            var entries = _allPlanes
-                .Select(p => new PlaneStateExportEntry
-                {
-                    PlaneStringID = p.PlaneStringID,
-                    Enabled = p.Enabled,
-                    OriginalDLCID = string.IsNullOrEmpty(p.DLCID) ? null : p.DLCID
-                })
-                .ToList();
-            var json = JsonConvert.SerializeObject(entries, Formatting.Indented);
-            File.WriteAllText(sfd.FileName, json);
-            Log($"Exported {entries.Count} plane states to {sfd.FileName}");
-            MessageBox.Show(this, $"Exported {entries.Count} plane states.", "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-        catch (Exception ex)
-        {
-            Log($"Export failed: {ex.Message}");
-            MessageBox.Show(this, ex.Message, "Export failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    private void importStateButton_Click(object? sender, EventArgs e)
-    {
-        if (_allPlanes.Count == 0)
-        {
-            MessageBox.Show(this, "Load plane data first (Unpack & Load).", "Import", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            return;
-        }
-
-        using var ofd = new OpenFileDialog
-        {
-            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-            CheckFileExists = true
-        };
-        if (ofd.ShowDialog(this) != DialogResult.OK)
-            return;
-
-        try
-        {
-            var json = File.ReadAllText(ofd.FileName);
-            var entries = JsonConvert.DeserializeObject<List<PlaneStateExportEntry>>(json);
-            if (entries == null || entries.Count == 0)
-            {
-                MessageBox.Show(this, "No entries in file or invalid format.", "Import", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            var byId = entries.ToDictionary(e => e.PlaneStringID, e => e, StringComparer.OrdinalIgnoreCase);
-            var updated = 0;
-            foreach (var plane in _allPlanes)
-            {
-                if (byId.TryGetValue(plane.PlaneStringID, out var entry))
-                {
-                    plane.Enabled = entry.Enabled;
-                    if (!string.IsNullOrEmpty(entry.OriginalDLCID))
-                        plane.DLCID = entry.OriginalDLCID;
-                    updated++;
-                }
-            }
-
-            ApplyPlaneFilters();
-            planesGrid.Refresh();
-            Log($"Imported plane states from {ofd.FileName}; updated {updated} of {_allPlanes.Count} planes.");
-            MessageBox.Show(this, $"Updated {updated} plane(s) from import.", "Import", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-        catch (Exception ex)
-        {
-            Log($"Import failed: {ex.Message}");
-            MessageBox.Show(this, ex.Message, "Import failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
     private void openOutputFolderButton_Click(object? sender, EventArgs e)
     {
         var pakPath = pakPathTextBox.Text;
@@ -565,8 +500,8 @@ public partial class MainForm : Form
             return;
         }
 
-        var outputDir = Path.Combine(Path.GetDirectoryName(pakPath) ?? string.Empty,
-            Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
+        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        var outputDir = Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
 
         if (!Directory.Exists(outputDir))
         {
