@@ -6,24 +6,20 @@ You do **not** need to know how `.uasset` files work or how to use command‑lin
 
 ### Requirements
 
-- **Game**
-  - ACE COMBAT™ 7: SKIES UNKNOWN (PC)
-
 - **UnrealPak Enhanced**
   - Download from ModDB:  
-    [https://www.moddb.com/downloads/unrealpak-enhanced](https://www.moddb.com/downloads/unrealpak-enhanced)
+    [UnrealPak Enhanced download page](https://www.moddb.com/downloads/unrealpak-enhanced)
   - After downloading, extract it somewhere easy to find (for example `C:\Tools\UnrealPakEnhanced`) and note where `UnrealPak.exe` is.
 
 - **Windows and .NET**
   - Windows 10 or newer.
-  - If the program does not start, install the latest **.NET 8 Desktop Runtime (x64)** from Microsoft’s website and try again.
+  - If the program does not start, install the latest **.NET 8 Desktop Runtime (x64)** from the official [.NET 8 download page](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.419-windows-x64-installer) and try again.
 
 ### Using DisableEnabler
 
 - **First‑time setup**
   - Copy `DisableEnabler.exe` to any folder you like (for example a `Tools` or `Mods` folder).
   - Start DisableEnabler by double‑clicking `DisableEnabler.exe`.
-  - (Optional) Turn on dark mode if you prefer a dark‑themed window.
 
 - **Pointing to UnrealPak**
   - Click **“Browse UnrealPak…”**.
@@ -55,7 +51,7 @@ You do **not** need to know how `.uasset` files work or how to use command‑lin
   - Use the **search box** above the table to find planes:
     - Type part of the plane’s ID (for example `f22a` or `f22a_vr`), or its numeric ID.
   - Use the filters:
-    - **Hide base game** hides standard base‑game planes (useful if you only care about DLC or modded entries).
+    - **Hide base game** hides standard base‑game planes (useful if you only care about modded entries).
     - **Hide VR planes** hides entries used only in VR mode.
   - At this stage, changes only exist in the program’s memory; you still need to save and pack.
 
@@ -102,5 +98,4 @@ You do **not** need to know how `.uasset` files work or how to use command‑lin
 
 - **UAssetAPI (MIT‑licensed)**
   - This tool uses **UAssetAPI** by **atenfyr**, licensed under the **MIT License**.
-  - See the UAssetAPI repository for the full license text:  
-    [https://github.com/atenfyr/UAssetAPI/blob/master/LICENSE](https://github.com/atenfyr/UAssetAPI/blob/master/LICENSE)
+  - Full license: [UAssetAPI LICENSE](https://github.com/atenfyr/UAssetAPI/blob/master/LICENSE)
