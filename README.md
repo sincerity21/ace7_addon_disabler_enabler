@@ -1,9 +1,9 @@
-### DisableEnabler for ACE COMBAT™ 7
+# DisableEnabler for ACE COMBAT™ 7
 
 DisableEnabler is a small Windows program for **ACE COMBAT™ 7: SKIES UNKNOWN**.  
-It lets you **turn individual player planes on or off** inside a mod `.pak` file, using a simple checklist-style window.
+It lets you **turn individual player planes on or off** inside a mod `.pak` file, using a simple checklist‑style window.
 
-You do **not** need to know how `.uasset` files work or how to use command‑line tools. DisableEnabler does the technical steps for you in the background.
+You do **not** need to know how `.uasset` files work or how to use command‑line tools. DisableEnabler does the technical steps for you in the background:
 
 - You pick your **UnrealPak** (tool used to open `.pak` files).
 - You choose the **mod `.pak`** which contains the plane list.
@@ -12,7 +12,22 @@ You do **not** need to know how `.uasset` files work or how to use command‑lin
 
 ---
 
-### What You Need
+## Table of Contents
+
+- [What You Need](#what-you-need)
+- [First Time Setup (One‑Time)](#first-time-setup-one-time)
+- [Step 1 – Tell the Program Where UnrealPak Is](#step-1--tell-the-program-where-unrealpak-is)
+- [Step 2 – Pick the Mod PAK You Want to Edit](#step-2--pick-the-mod-pak-you-want-to-edit)
+- [Step 3 – Unpack the PAK and Load the Plane List](#step-3--unpack-the-pak-and-load-the-plane-list)
+- [Step 4 – Turn Planes On or Off](#step-4--turn-planes-on-or-off)
+- [Step 5 – Save Changes and Build a New PAK](#step-5--save-changes-and-build-a-new-pak)
+- [Step 6 – Put the New PAK Into Your Mods Folder](#step-6--put-the-new-pak-into-your-mods-folder)
+- [Extra Notes](#extra-notes)
+- [Credits](#credits)
+
+---
+
+## What You Need
 
 - **The game**
   - **ACE COMBAT™ 7: SKIES UNKNOWN** on PC.
@@ -28,7 +43,7 @@ You do **not** need to know how `.uasset` files work or how to use command‑lin
 
 ---
 
-### First Time Setup (One‑Time)
+## First Time Setup (One‑Time)
 
 1. **Put DisableEnabler somewhere**
    - Copy `DisableEnabler.exe` to any folder you like (for example a `Tools` or `Mods` folder).
@@ -44,7 +59,7 @@ You do **not** need to know how `.uasset` files work or how to use command‑lin
 
 ---
 
-### Step 1 – Tell the Program Where UnrealPak Is
+## Step 1 – Tell the Program Where UnrealPak Is
 
 1. In DisableEnabler, click **“Browse UnrealPak…”**.
 2. A file window will open. Go to the folder where you extracted **UnrealPak Enhanced**.
@@ -53,7 +68,7 @@ You do **not** need to know how `.uasset` files work or how to use command‑lin
 
 ---
 
-### Step 2 – Pick the Mod PAK You Want to Edit
+## Step 2 – Pick the Mod PAK You Want to Edit
 
 You will be editing a **mod `.pak` file** (not the base game files). This is usually a file placed in your `~mods` folder.
 
@@ -72,7 +87,7 @@ You can choose it in two ways:
 
 ---
 
-### Step 3 – Unpack the PAK and Load the Plane List
+## Step 3 – Unpack the PAK and Load the Plane List
 
 1. Check that:
    - The **UnrealPak** box shows a valid path to `UnrealPak.exe`.
@@ -90,7 +105,7 @@ After this finishes, you will see a list of planes in the big table in the main 
 
 ---
 
-### Step 4 – Turn Planes On or Off
+## Step 4 – Turn Planes On or Off
 
 - **Turning planes on or off**
   - In the table, look for the **“Enabled”** column.
@@ -109,7 +124,7 @@ At this point, your changes are only in the program’s memory. You still need t
 
 ---
 
-### Step 5 – Save Changes and Build a New PAK
+## Step 5 – Save Changes and Build a New PAK
 
 1. When you are happy with your on/off choices, click the button that says **“Apply & Save”** or **“Apply, Save & Pack”** (the wording may vary slightly).
 2. DisableEnabler will then:
@@ -126,7 +141,7 @@ At this point, your changes are only in the program’s memory. You still need t
 
 ---
 
-### Step 6 – Put the New PAK Into Your Mods Folder
+## Step 6 – Put the New PAK Into Your Mods Folder
 
 1. In File Explorer, open the folder that contains the new `*_DisableEnabler_P.pak` file (you can use **“Open Output Folder”** to get there).
 2. Copy that new `.pak` file into your ACE COMBAT 7 mods folder, for example:
@@ -135,7 +150,7 @@ At this point, your changes are only in the program’s memory. You still need t
 
 ---
 
-### Extra Notes
+## Extra Notes
 
 - **Settings file**
   - DisableEnabler keeps a small text file called `DisableEnabler.config` next to the program.
@@ -154,16 +169,15 @@ At this point, your changes are only in the program’s memory. You still need t
 
 ---
 
-### Credits
+## Credits
 
 - **UnrealPak**
   - **Epic Games** – for the original UnrealPak binaries.
   - **FluffyQuack** – for the original UnrealPak batch script approach.
   - **Various Stack Overflow users** – for batch scripting and general coding references.
 
-- **UAssetAPI (MIT-licensed)**
+- **UAssetAPI (MIT‑licensed)**
   - This tool uses **UAssetAPI** by **atenfyr**, licensed under the **MIT License**.
   - Copyright:
     - `Copyright (c) 2020 - 2026 atenfyr`
   - The full license text is included in `UAssetAPI/LICENSE` and must remain with any redistributions of UAssetAPI.
-
