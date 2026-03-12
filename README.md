@@ -1,15 +1,15 @@
-# DisableEnabler - Plane Enable/Disable Tool for ACE COMBAT™ 7
+# The DisableEnabler™
 
-DisableEnabler is a small Windows program for **ACE COMBAT™ 7: SKIES UNKNOWN** that lets you **turn individual player planes on or off** inside a mod `.pak` file using a simple checklist‑style window.
+DisableEnabler is a modding tool for **ACE COMBAT™ 7: SKIES UNKNOWN** that lets you **turn individual playable planes on or off** inside a mod `.pak` file using a simple checklist‑style window.
 
-You do **not** need to know how `.uasset` files work or how to use command‑line tools. DisableEnabler does the technical steps for you in the background: you point it at **UnrealPak** and a mod `.pak`, it shows the planes in a table, and it builds a new `.pak` with your changes.
+Doesn't involve users needing to manually modify files and unpack to disable; just run the tool, untick which planes you want to disable, and it'll do the job.
 
 ### Requirements
 
 - **UnrealPak Enhanced**
   - Download from ModDB:  
     [UnrealPak Enhanced download page](https://www.moddb.com/downloads/unrealpak-enhanced)
-  - After downloading, extract it somewhere easy to find (for example `C:\Tools\UnrealPakEnhanced`) and note where `UnrealPak.exe` is.
+  - After downloading, extract it somewhere easy to find (for example `C:\Tools\UnrealPakEnhanced`) and note where `UnrealPak.exe` is (should be inside `UnrealPakEnhanced\Engine\Binaries\Win64`).
 
 - **Windows and .NET**
   - Windows 10 or newer.
