@@ -102,4 +102,5 @@ You do **not** need to know how `.uasset` files work or how to use command‑lin
 
 - **UAssetAPI (MIT‑licensed)**
   - This tool uses **UAssetAPI** by **atenfyr**, licensed under the **MIT License**.
-  - See [`UAssetAPI/LICENSE`](UAssetAPI/LICENSE) for the full license text, which is included unchanged and must remain with any redistributions of UAssetAPI.
+  - See the UAssetAPI repository for the full license text:  
+    [https://github.com/atenfyr/UAssetAPI/blob/master/LICENSE](https://github.com/atenfyr/UAssetAPI/blob/master/LICENSE)
