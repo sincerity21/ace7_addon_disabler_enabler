@@ -7,13 +7,12 @@ Doesn't involve users needing to manually modify files and unpack to disable; ju
 ### Requirements
 
 - **UnrealPak Enhanced**
-  - Download from ModDB:  
-    [UnrealPak Enhanced download page](https://www.moddb.com/downloads/unrealpak-enhanced)
+  - [Download from ModDB](https://www.moddb.com/downloads/unrealpak-enhanced)
   - After downloading, extract it somewhere easy to find (for example `C:\Tools\UnrealPakEnhanced`) and note where `UnrealPak.exe` is (should be inside `UnrealPakEnhanced\Engine\Binaries\Win64`).
 
 - **Windows and .NET**
   - Windows 10 or newer.
-  - If the program does not start, install the latest **.NET 8 Desktop Runtime (x64)** from the official [.NET 8 download page](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.419-windows-x64-installer) and try again.
+  - If the program does not start, install the latest **.NET 8 Desktop Runtime (x64)** from the official [.NET 8 page](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.419-windows-x64-installer) and try again.
 
 ### Using DisableEnabler
 
