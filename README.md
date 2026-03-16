@@ -25,7 +25,7 @@ Doesn't involve users needing to manually modify files and unpack to disable; ju
      (This is remembered for next time.)
 
 3. **Pick a mod PAK**
-   - Click **“Scan Mods Folder…”** and choose the folder that contains your mod `.pak` files (usually your `~mods` folder), or type/paste the full path to a `.pak` that ends with `_P.pak`.
+   - Click **“Scan Mods Folder…”** and choose the folder that contains your mod `.pak` files (usually your `~mods` folder), or type/paste the full path to a `.pak`.
 
 4. **Load the plane list**
    - Click **“Unpack & Load”**. DisableEnabler unpacks the PAK, finds the plane list, and fills the table with all planes it finds.
@@ -35,7 +35,7 @@ Doesn't involve users needing to manually modify files and unpack to disable; ju
    - Use the search box and the **Hide base game / Hide VR planes** checkboxes to quickly filter the list.
 
 6. **Build the new PAK and install it**
-   - Click **“Apply & Save”** (or **“Apply, Save & Pack”**), then use **“Open Output Folder”** to get the new `*_DisableEnabler_P.pak`.  
+   - Click **“Apply, Save & Pack”**, then use **“Open Output Folder”** to get the new `*_DisableEnabler_P.pak`.  
    - Copy that file into your `~mods` folder so it loads after the original mod.
 
 ### Extra notes
