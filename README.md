@@ -17,60 +17,26 @@ Doesn't involve users needing to manually modify files and unpack to disable; ju
 
 ### Using DisableEnabler
 
-- **First‑time setup**
-  - Copy `DisableEnabler.exe` to any folder you like (for example a `Tools` or `Mods` folder).
-  - Start DisableEnabler by double‑clicking `DisableEnabler.exe`.
+1. **Start the tool**
+   - Put `DisableEnabler.exe` anywhere you like (for example in a `Tools` or `Mods` folder) and double‑click it to run.
 
-- **Pointing to UnrealPak**
-  - Click **“Browse UnrealPak…”**.
-  - In the file window, browse to the folder where you extracted UnrealPak Enhanced.
-  - Select `UnrealPak.exe` and click **Open**. DisableEnabler will remember this path for future runs.
+2. **Point it at UnrealPak**
+   - Click **“Browse UnrealPak…”**, browse to where you extracted UnrealPak Enhanced, select `UnrealPak.exe`, and click **Open**.  
+     (This is remembered for next time.)
 
-- **Choosing the mod PAK**
-  - You will be editing a **mod `.pak` file** (usually in your `~mods` folder), not the base game files.
-  - Recommended: click **“Scan Mods Folder…”**, select the folder that contains your mod `.pak` files (for example your `~mods` folder), and click **Select Folder**. DisableEnabler will pick the `.pak` that contains the plane list and wins in load order.
-  - Alternatively, type or paste the full path to a `.pak` directly into the PAK path box. The file name should end with `_P.pak` (for example `MyMod_P.pak`).
+3. **Pick a mod PAK**
+   - Click **“Scan Mods Folder…”** and choose the folder that contains your mod `.pak` files (usually your `~mods` folder), or type/paste the full path to a `.pak` that ends with `_P.pak`.
 
-- **Unpacking and loading the plane list**
-  - Confirm that:
-    - The **UnrealPak** box points to a valid `UnrealPak.exe`.
-    - The **PAK path** box points to the `.pak` you want to edit and the file name ends in `_P.pak`.
-  - Click **“Unpack & Load”**.
-  - DisableEnabler will:
-    - Create a folder next to the program named like `<YourPakName>_unpacked\`.
-    - Use UnrealPak to open the `.pak`.
-    - Find the internal plane list file and convert it into a format it can show in the table.
-    - If it finds `DisableEnabler_plane_states.json` from a previous run, it will restore your previous on/off settings.
-  - When this completes, the main table will be filled with planes.
+4. **Load the plane list**
+   - Click **“Unpack & Load”**. DisableEnabler unpacks the PAK, finds the plane list, and fills the table with all planes it finds.
 
-- **Editing which planes are enabled**
-  - In the table, use the **“Enabled”** checkbox column:
-    - Checked = plane enabled.
-    - Unchecked = plane disabled.
-  - You can select multiple rows (with Shift / Ctrl like in other Windows programs) and then click a single checkbox to change all selected planes at once.
-  - Use the **search box** above the table to find planes:
-    - Type part of the plane’s ID (for example `f22a` or `f22a_vr`), or its numeric ID.
-  - Use the filters:
-    - **Hide base game** hides standard base‑game planes (useful if you only care about modded entries).
-    - **Hide VR planes** hides entries used only in VR mode.
-  - At this stage, changes only exist in the program’s memory; you still need to save and pack.
+5. **Choose which planes are enabled**
+   - Tick or untick the **“Enabled”** checkboxes to turn planes on or off.  
+   - Use the search box and the **Hide base game / Hide VR planes** checkboxes to quickly filter the list.
 
-- **Saving and packing a new PAK**
-  - When you are happy with your changes, click **“Apply & Save”** or **“Apply, Save & Pack”** (depending on the build).
-  - DisableEnabler will:
-    - Apply your on/off choices to the internal data.
-    - Update the game data file using **UAssetAPI**.
-    - Save a helper file `DisableEnabler_plane_states.json` so your current setup can be restored on the next run.
-    - Use `UnrealPak.exe` to build a **new mod `.pak`** with your settings.
-  - The new `.pak` is written into the same `<YourPakName>_unpacked\` folder. Example:
-    - Input: `~MyPlanes_P.pak`  
-      Output: `~~~~~MyPlanes_DisableEnabler_P.pak` (extra `~` characters help ensure it loads after the original mod).
-  - Use **“Open Output Folder”** in the program to quickly open the folder containing the new file.
-
-- **Installing the new PAK**
-  - Copy the generated `*_DisableEnabler_P.pak` from the unpack folder into your ACE COMBAT 7 mods folder, for example:
-    - `...\ACE COMBAT 7\Game\Content\Paks\~mods\`
-  - Make sure the new file’s name (especially the leading `~` characters) means it loads **after** the original mod you edited so that your changes take effect.
+6. **Build the new PAK and install it**
+   - Click **“Apply & Save”** (or **“Apply, Save & Pack”**), then use **“Open Output Folder”** to get the new `*_DisableEnabler_P.pak`.  
+   - Copy that file into your `~mods` folder so it loads after the original mod.
 
 ### Extra notes
 
