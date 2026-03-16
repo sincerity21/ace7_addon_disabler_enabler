@@ -2,6 +2,8 @@
 
 DisableEnabler is a modding tool for **ACE COMBAT™ 7: SKIES UNKNOWN** that lets you **turn individual playable planes on or off** inside a mod `.pak` file using a simple checklist‑style window.
 
+Under the hood, it works on the game’s `PlayerPlaneDataTable` asset (the data table that tells the game which planes exist and whether they are enabled/disabled), so you don’t have to edit that file manually.
+
 Doesn't involve users needing to manually modify files and unpack to disable; just run the tool, untick which planes you want to disable, and it'll do the job.
 
 The program was vibe‑coded with Cursor Pro.
@@ -27,7 +29,7 @@ The program was vibe‑coded with Cursor Pro.
      (This is remembered for next time.)
 
 3. **Pick a mod PAK**
-   - Click **“Scan Mods Folder…”** and choose the folder that contains your mod `.pak` files (usually your `~mods` folder), or type/paste the full path to a `.pak`.
+   - Click **“Scan Mods Folder…”** and choose the folder that contains your mod `.pak` files (usually your `~mods` folder). DisableEnabler will scan that folder, find the `.pak` that contains the “winning” `PlayerPlaneDataTable` (the one that actually takes effect in‑game), and select that PAK for you. You can also type/paste the full path to a `.pak` manually if you prefer.
 
 4. **Load the plane list**
    - Click **“Unpack & Load”**. DisableEnabler unpacks the PAK, finds the plane list, and fills the table with all planes it finds.
