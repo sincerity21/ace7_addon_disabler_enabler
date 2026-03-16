@@ -1,4 +1,4 @@
-# The DisableEnabler™
+# The DisableEnabler
 
 DisableEnabler is a modding tool for **ACE COMBAT™ 7: SKIES UNKNOWN** that lets you **turn individual playable planes on or off** inside a mod `.pak` file using a simple checklist‑style window.
 
