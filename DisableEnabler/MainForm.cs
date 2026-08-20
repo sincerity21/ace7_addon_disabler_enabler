@@ -27,9 +27,46 @@ public partial class MainForm : Form
         LoadConfig();
         ApplyTheme();
         // #region agent log
-        Shown += (_, _) => AgentDebugLog("H1", "MainForm.Shown", "form shown dpi/theme baseline", CaptureUiDiagnostics("shown"));
+        Shown += (_, _) =>
+        {
+            EnsureCheckboxColumnFitsDpi();
+            AgentDebugLog("H1", "MainForm.Shown", "form shown dpi/theme baseline", CaptureUiDiagnostics("shown"));
+        };
         planesGrid.CellPainting += planesGrid_AgentCellPainting;
         // #endregion
+    }
+
+    /// <summary>
+    /// At &gt;100% DPI, DataGridViewCheckBoxColumn stays at MinimumWidth 30 while
+    /// checkbox PreferredSize grows, so glyphs clip and the column looks empty.
+    /// </summary>
+    private void EnsureCheckboxColumnFitsDpi()
+    {
+        if (planesGrid.Columns["Enabled"] is not DataGridViewCheckBoxColumn enabledCol)
+            return;
+
+        enabledCol.HeaderText = "Enabled";
+
+        // Designer used 30px at 96 DPI; scale for the glyph, then grow enough for the header text.
+        var minW = Math.Max(48, (int)Math.Ceiling(48.0 * DeviceDpi / 96.0));
+        var headerFont = planesGrid.ColumnHeadersDefaultCellStyle.Font ?? planesGrid.Font;
+        var headerNeed = TextRenderer.MeasureText(
+            enabledCol.HeaderText,
+            headerFont,
+            Size.Empty,
+            TextFormatFlags.SingleLine | TextFormatFlags.NoPrefix).Width + 20;
+        minW = Math.Max(minW, headerNeed);
+
+        enabledCol.MinimumWidth = minW;
+        enabledCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+        enabledCol.Width = minW;
+
+        var rowH = Math.Max(28, (int)Math.Ceiling(28.0 * DeviceDpi / 96.0));
+        planesGrid.RowTemplate.Height = rowH;
+        foreach (DataGridViewRow row in planesGrid.Rows)
+        {
+            row.Height = rowH;
+        }
     }
 
     // #region agent log
@@ -67,7 +104,7 @@ public partial class MainForm : Form
             var payload = new Dictionary<string, object?>
             {
                 ["sessionId"] = "622498",
-                ["runId"] = "pre-fix",
+                ["runId"] = "post-fix",
                 ["hypothesisId"] = hypothesisId,
                 ["location"] = location,
                 ["message"] = message,
@@ -483,6 +520,7 @@ public partial class MainForm : Form
             Log($"Loaded {rows.Count} planes from {jsonPath}");
 
             // #region agent log
+            EnsureCheckboxColumnFitsDpi();
             _agentPaintLogCount = 0;
             planesGrid.Invalidate();
             AgentDebugLog("H1-H5", "MainForm.unpackAndLoadButton_Click", "post-load checkbox/UI diagnostics", CaptureUiDiagnostics("post-load"));
@@ -803,6 +841,8 @@ public partial class MainForm : Form
 
             _planes.Add(plane);
         }
+
+        EnsureCheckboxColumnFitsDpi();
     }
 }
 
