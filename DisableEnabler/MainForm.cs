@@ -26,14 +26,7 @@ public partial class MainForm : Form
         planesGrid.DataSource = _planes;
         LoadConfig();
         ApplyTheme();
-        // #region agent log
-        Shown += (_, _) =>
-        {
-            EnsureCheckboxColumnFitsDpi();
-            AgentDebugLog("H1", "MainForm.Shown", "form shown dpi/theme baseline", CaptureUiDiagnostics("shown"));
-        };
-        planesGrid.CellPainting += planesGrid_AgentCellPainting;
-        // #endregion
+        Shown += (_, _) => EnsureCheckboxColumnFitsDpi();
     }
 
     /// <summary>
@@ -68,134 +61,6 @@ public partial class MainForm : Form
             row.Height = rowH;
         }
     }
-
-    // #region agent log
-    private int _agentPaintLogCount;
-
-    private void planesGrid_AgentCellPainting(object? sender, DataGridViewCellPaintingEventArgs e)
-    {
-        if (_agentPaintLogCount >= 3)
-            return;
-        if (e.ColumnIndex < 0 || e.RowIndex < 0)
-            return;
-        if (planesGrid.Columns[e.ColumnIndex].Name != "Enabled")
-            return;
-
-        _agentPaintLogCount++;
-        AgentDebugLog("H3", "MainForm.CellPainting", "Enabled checkbox cell paint", new
-        {
-            e.RowIndex,
-            e.ColumnIndex,
-            cellBoundsW = e.CellBounds.Width,
-            cellBoundsH = e.CellBounds.Height,
-            clipW = e.ClipBounds.Width,
-            value = e.Value?.ToString(),
-            valueType = e.Value?.GetType().FullName,
-            paintParts = e.PaintParts.ToString(),
-            handled = e.Handled,
-            darkMode = _isDarkMode
-        });
-    }
-
-    private static void AgentDebugLog(string hypothesisId, string location, string message, object data)
-    {
-        try
-        {
-            var payload = new Dictionary<string, object?>
-            {
-                ["sessionId"] = "622498",
-                ["runId"] = "post-fix",
-                ["hypothesisId"] = hypothesisId,
-                ["location"] = location,
-                ["message"] = message,
-                ["data"] = data,
-                ["timestamp"] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-            };
-            var line = JsonConvert.SerializeObject(payload) + Environment.NewLine;
-            var paths = new[]
-            {
-                @"D:\Modding\ACE7\(PROJECT)\since_Disable-Enabler\debug-622498.log",
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug-622498.log")
-            };
-            foreach (var path in paths)
-            {
-                try { File.AppendAllText(path, line); } catch { /* ignore */ }
-            }
-        }
-        catch
-        {
-            // ignore debug log failures
-        }
-    }
-
-    private object CaptureUiDiagnostics(string phase)
-    {
-        float dpiX = 96f, dpiY = 96f;
-        try
-        {
-            using var g = CreateGraphics();
-            dpiX = g.DpiX;
-            dpiY = g.DpiY;
-        }
-        catch { /* ignore */ }
-
-        DataGridViewColumn? enabledCol = null;
-        try { enabledCol = planesGrid.Columns["Enabled"]; } catch { /* ignore */ }
-
-        object? firstCell = null;
-        if (planesGrid.RowCount > 0 && enabledCol != null)
-        {
-            var cell = planesGrid.Rows[0].Cells[enabledCol.Index];
-            firstCell = new
-            {
-                cellType = cell.GetType().Name,
-                value = cell.Value,
-                valueType = cell.Value?.GetType().FullName,
-                formatted = cell.FormattedValue?.ToString(),
-                preferredSize = cell.PreferredSize.ToString(),
-                styleBack = cell.Style.BackColor.Name,
-                inheritedBack = cell.InheritedStyle.BackColor.ToArgb()
-            };
-        }
-
-        var colWidths = planesGrid.Columns.Cast<DataGridViewColumn>()
-            .Select(c => new { c.Name, c.Width, c.DisplayIndex, c.Visible, header = c.HeaderText, autoSize = c.AutoSizeMode.ToString() })
-            .ToList();
-
-        return new
-        {
-            phase,
-            darkMode = _isDarkMode,
-            deviceDpi = DeviceDpi,
-            dpiX,
-            dpiY,
-            scaleApprox = Math.Round(dpiX / 96.0, 2),
-            autoScaleMode = AutoScaleMode.ToString(),
-            autoScaleDimensions = AutoScaleDimensions.ToString(),
-            formClient = ClientSize.ToString(),
-            gridClient = planesGrid.ClientSize.ToString(),
-            gridRowCount = planesGrid.RowCount,
-            boundPlanes = _planes.Count,
-            allPlanes = _allPlanes.Count,
-            enabledTrue = _planes.Count(p => p.Enabled),
-            enabledFalse = _planes.Count(p => !p.Enabled),
-            enabledCol = enabledCol == null ? null : new
-            {
-                enabledCol.Name,
-                enabledCol.HeaderText,
-                enabledCol.Width,
-                enabledCol.MinimumWidth,
-                enabledCol.Visible,
-                enabledCol.DisplayIndex,
-                enabledCol.DataPropertyName,
-                autoSize = enabledCol.AutoSizeMode.ToString(),
-                type = enabledCol.GetType().Name
-            },
-            columns = colWidths,
-            firstEnabledCell = firstCell
-        };
-    }
-    // #endregion
 
     private void darkModeCheckBox_CheckedChanged(object? sender, EventArgs e)
     {
@@ -306,17 +171,6 @@ public partial class MainForm : Form
 
         if (e.Button != MouseButtons.Left || e.RowIndex < 0 || e.ColumnIndex < 0)
             return;
-
-        // #region agent log
-        AgentDebugLog("H5", "MainForm.CellMouseDown", "grid cell click", new
-        {
-            e.RowIndex,
-            e.ColumnIndex,
-            colName = planesGrid.Columns[e.ColumnIndex].Name,
-            colWidth = planesGrid.Columns[e.ColumnIndex].Width,
-            value = planesGrid[e.ColumnIndex, e.RowIndex].Value?.ToString()
-        });
-        // #endregion
 
         // Only customize behavior for the Enabled checkbox column.
         if (planesGrid.Columns[e.ColumnIndex].Name != "Enabled")
@@ -518,20 +372,10 @@ public partial class MainForm : Form
             ApplyPlaneFilters();
 
             Log($"Loaded {rows.Count} planes from {jsonPath}");
-
-            // #region agent log
-            EnsureCheckboxColumnFitsDpi();
-            _agentPaintLogCount = 0;
-            planesGrid.Invalidate();
-            AgentDebugLog("H1-H5", "MainForm.unpackAndLoadButton_Click", "post-load checkbox/UI diagnostics", CaptureUiDiagnostics("post-load"));
-            // #endregion
         }
         catch (Exception ex)
         {
             Log($"Error during Unpack & Load: {ex.Message}");
-            // #region agent log
-            AgentDebugLog("H2", "MainForm.unpackAndLoadButton_Click", "unpack/load exception", new { ex.Message, ex.GetType().Name });
-            // #endregion
             MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
