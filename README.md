@@ -29,7 +29,7 @@ The program was vibe‑coded with Cursor Pro.
      (This is remembered for next time.)
 
 3. **Pick a mod PAK**
-   - Click **“Scan Mods Folder…”** and choose the folder that contains your mod `.pak` files (usually your `~mods` folder). DisableEnabler will scan that folder, find the `.pak` that contains the “winning” `PlayerPlaneDataTable` (the one that actually takes effect in‑game), and select that PAK for you. You can also type/paste the full path to a `.pak` manually if you prefer.
+   - Click **“Choose ~mods”** and pick the folder that contains your mod `.pak` files (usually your `~mods` folder). DisableEnabler will scan that folder, find the `.pak` that contains the “winning” `PlayerPlaneDataTable` (the one that actually takes effect in‑game), and select that PAK for you. You can also type/paste the full path to a `.pak` manually if you prefer.
 
 4. **Load the plane list**
    - Click **“Unpack & Load”**. DisableEnabler unpacks the PAK, finds the plane list, and fills the table with all planes it finds.
@@ -38,9 +38,9 @@ The program was vibe‑coded with Cursor Pro.
    - Tick or untick the **“Enabled”** checkboxes to turn planes on or off.  
    - Use the search box and the **Hide base game / Hide VR planes** checkboxes to quickly filter the list.
 
-6. **Build the new PAK and install it**
-   - Click **“Apply, Save & Pack”**, then use **“Open Output Folder”** to get the new `*_DisableEnabler_P.pak`.  
-   - Copy that file into your `~mods` folder so it loads after the original mod.
+6. **Build the new PAK**
+   - Click **“Apply, Save & Pack”**. DisableEnabler writes the new `*_DisableEnabler_P.pak` into the `~mods` folder you scanned (or next to the source `.pak` if you pasted a path).  
+   - Use **“Open Output Folder”** to jump there. You do not need to copy the file by hand.
 
 ### Extra notes
 
@@ -48,6 +48,7 @@ The program was vibe‑coded with Cursor Pro.
   - DisableEnabler stores settings in `DisableEnabler.config` next to the program.
   - It remembers:
     - The `UnrealPak.exe` path.
+    - The last scanned mods (`~mods`) folder, used as the pack output location.
     - Dark mode preference.
     - Whether to hide base‑game and/or VR planes.
   - You normally do not need to edit this file by hand.

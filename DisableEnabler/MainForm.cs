@@ -18,6 +18,7 @@ public partial class MainForm : Form
     private readonly HashSet<int> _selectedRowIndexes = new();
     private static readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DisableEnabler.config");
     private bool _isDarkMode;
+    private string? _modsOutputFolder;
 
     public MainForm()
     {
@@ -249,11 +250,15 @@ public partial class MainForm : Form
                 UseDescriptionForTitle = true,
                 ShowNewFolderButton = false
             };
+            if (!string.IsNullOrWhiteSpace(_modsOutputFolder) && Directory.Exists(_modsOutputFolder))
+                fbd.SelectedPath = _modsOutputFolder;
 
             if (fbd.ShowDialog(this) != DialogResult.OK || string.IsNullOrWhiteSpace(fbd.SelectedPath))
                 return;
 
             var chosenFolder = fbd.SelectedPath;
+            _modsOutputFolder = chosenFolder;
+            SaveConfig();
             Log($"Choosing PAK from folder: {chosenFolder}");
 
             string? winningPak;
@@ -283,7 +288,7 @@ public partial class MainForm : Form
         }
         catch (Exception ex)
         {
-            Log($"Unexpected error during Choose PAK: {ex.Message}");
+            Log($"Unexpected error during Choose ~mods: {ex.Message}");
             MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
@@ -502,10 +507,10 @@ public partial class MainForm : Form
             {
                 outputFileName = new string('~', 5) + outputFileName;
             }
-            // Place the packed PAK inside the program's unpack folder alongside the extracted files.
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
             var unpackDir = Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
-            var outputPakPath = Path.Combine(unpackDir, outputFileName);
+            var outputDir = GetPackedPakOutputDirectory(pakPath);
+            var outputPakPath = Path.Combine(outputDir, outputFileName);
 
             var assetPath = PlaneDataService.FindPlayerPlaneDataTable(unpackDir);
             var assetDir = Path.GetDirectoryName(assetPath) ?? unpackDir;
@@ -534,8 +539,7 @@ public partial class MainForm : Form
             return;
         }
 
-        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        var outputDir = Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
+        var outputDir = GetPackedPakOutputDirectory(pakPath);
 
         if (!Directory.Exists(outputDir))
         {
@@ -546,6 +550,23 @@ public partial class MainForm : Form
 
         Process.Start("explorer.exe", outputDir);
         Log($"Opened output folder: {outputDir}");
+    }
+
+    /// <summary>
+    /// Packed PAKs go into the scanned ~mods folder when available; otherwise next to the source PAK.
+    /// Unpack working files stay next to the program.
+    /// </summary>
+    private string GetPackedPakOutputDirectory(string pakPath)
+    {
+        if (!string.IsNullOrWhiteSpace(_modsOutputFolder) && Directory.Exists(_modsOutputFolder))
+            return _modsOutputFolder;
+
+        var pakDir = Path.GetDirectoryName(pakPath);
+        if (!string.IsNullOrWhiteSpace(pakDir) && Directory.Exists(pakDir))
+            return pakDir;
+
+        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        return Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
     }
 
     private void searchTextBox_TextChanged(object? sender, EventArgs e)
@@ -593,6 +614,10 @@ public partial class MainForm : Form
                 {
                     hideVrPlanesCheckBox.Checked = hideVr;
                 }
+                else if (key.Equals("ModsFolder", StringComparison.OrdinalIgnoreCase) && Directory.Exists(value))
+                {
+                    _modsOutputFolder = value;
+                }
             }
         }
         catch
@@ -616,6 +641,8 @@ public partial class MainForm : Form
             sb.AppendLine($"DarkMode={_isDarkMode}");
             sb.AppendLine($"HideBaseGame={hideBaseGameCheckBox.Checked}");
             sb.AppendLine($"HideVrPlanes={hideVrPlanesCheckBox.Checked}");
+            if (!string.IsNullOrWhiteSpace(_modsOutputFolder))
+                sb.AppendLine($"ModsFolder={_modsOutputFolder}");
 
             File.WriteAllText(ConfigPath, sb.ToString());
         }

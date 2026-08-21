@@ -42,27 +42,28 @@ public partial class MainForm
         this.pakPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         this.pakPathTextBox.BorderStyle = BorderStyle.FixedSingle;
         this.pakPathTextBox.Location = new System.Drawing.Point(12, 12);
-        this.pakPathTextBox.Size = new System.Drawing.Size(508, 24);
+        this.pakPathTextBox.Size = new System.Drawing.Size(478, 24);
 
         // scanModsFolderButton
         this.scanModsFolderButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
         this.scanModsFolderButton.FlatStyle = FlatStyle.Flat;
-        this.scanModsFolderButton.Location = new System.Drawing.Point(528, 11);
-        this.scanModsFolderButton.Size = new System.Drawing.Size(90, 28);
-        this.scanModsFolderButton.Text = "Choose PAK";
+        this.scanModsFolderButton.Location = new System.Drawing.Point(498, 11);
+        this.scanModsFolderButton.Size = new System.Drawing.Size(120, 28);
+        this.scanModsFolderButton.Text = "Choose ~mods";
+        this.scanModsFolderButton.UseMnemonic = false;
         this.scanModsFolderButton.Click += this.scanModsFolderButton_Click;
 
         // unrealPakPathTextBox
         this.unrealPakPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         this.unrealPakPathTextBox.BorderStyle = BorderStyle.FixedSingle;
         this.unrealPakPathTextBox.Location = new System.Drawing.Point(12, 44);
-        this.unrealPakPathTextBox.Size = new System.Drawing.Size(508, 24);
+        this.unrealPakPathTextBox.Size = new System.Drawing.Size(478, 24);
 
         // browseUnrealPakButton
         this.browseUnrealPakButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
         this.browseUnrealPakButton.FlatStyle = FlatStyle.Flat;
-        this.browseUnrealPakButton.Location = new System.Drawing.Point(528, 42);
-        this.browseUnrealPakButton.Size = new System.Drawing.Size(90, 28);
+        this.browseUnrealPakButton.Location = new System.Drawing.Point(498, 42);
+        this.browseUnrealPakButton.Size = new System.Drawing.Size(120, 28);
         this.browseUnrealPakButton.Text = "Browse EXE";
         this.browseUnrealPakButton.Click += this.browseUnrealPakButton_Click;
 
