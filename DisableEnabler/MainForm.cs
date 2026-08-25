@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Collections.Generic;
@@ -19,6 +20,8 @@ public partial class MainForm : Form
     private static readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DisableEnabler.config");
     private bool _isDarkMode;
     private string? _modsOutputFolder;
+    private Font? _modLinkFont;
+    private Color _modLinkColor = Color.Blue;
 
     public MainForm()
     {
@@ -26,8 +29,26 @@ public partial class MainForm : Form
         planesGrid.AutoGenerateColumns = false;
         planesGrid.DataSource = _planes;
         LoadConfig();
+        AddonDatabaseService.LoadLocal(Log);
+        _ = CheckAddonDatabaseUpdateAsync();
         ApplyTheme();
         Shown += (_, _) => EnsureCheckboxColumnFitsDpi();
+    }
+
+    private async Task CheckAddonDatabaseUpdateAsync()
+    {
+        await AddonDatabaseService.TryUpdateFromRemoteAsync(msg =>
+        {
+            if (IsHandleCreated && !IsDisposed)
+                BeginInvoke(() => Log(msg));
+        }).ConfigureAwait(true);
+    }
+
+    private void EnrichPlanesFromAddonDatabase()
+    {
+        AddonDatabaseService.LoadLocal(Log);
+        var enriched = AddonDatabaseService.Enrich(_allPlanes);
+        Log($"Enriched {enriched}/{_allPlanes.Count} planes with catalog metadata.");
     }
 
     /// <summary>
@@ -61,6 +82,26 @@ public partial class MainForm : Form
         {
             row.Height = rowH;
         }
+
+        FitCompactGridColumns();
+    }
+
+    /// <summary>
+    /// Keeps PlaneStringID and Name tight to content so they stay left-aligned next to PlaneID.
+    /// Mod uses Fill for any remaining grid width.
+    /// </summary>
+    private void FitCompactGridColumns()
+    {
+        foreach (var columnName in new[] { "PlaneStringID", "Name" })
+        {
+            if (planesGrid.Columns[columnName] is { } col)
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+        }
+
+        planesGrid.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+
+        if (planesGrid.Columns["Mod"] is { } modCol)
+            modCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
     }
 
     private void darkModeCheckBox_CheckedChanged(object? sender, EventArgs e)
@@ -125,6 +166,8 @@ public partial class MainForm : Form
 
     private void ApplyThemeToDataGridView(DataGridView grid)
     {
+        _modLinkColor = _isDarkMode ? Color.FromArgb(100, 180, 255) : Color.Blue;
+
         if (_isDarkMode)
         {
             grid.BackgroundColor = Color.FromArgb(38, 38, 38);
@@ -151,6 +194,9 @@ public partial class MainForm : Form
             grid.ColumnHeadersDefaultCellStyle.ForeColor = SystemColors.ControlText;
             grid.EnableHeadersVisualStyles = false;
         }
+
+        _modLinkFont?.Dispose();
+        _modLinkFont = new Font(grid.Font, FontStyle.Underline);
     }
 
     private void filterCheckBox_CheckedChanged(object? sender, EventArgs e)
@@ -231,6 +277,43 @@ public partial class MainForm : Form
 
         planesGrid.Refresh();
         _selectedRowIndexes.Clear();
+    }
+
+    private void planesGrid_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
+    {
+        if (e.ColumnIndex < 0 || e.RowIndex < 0)
+            return;
+        if (planesGrid.Columns[e.ColumnIndex].Name != "Mod")
+            return;
+        if (planesGrid.Rows[e.RowIndex].DataBoundItem is not PlaneDataRow row)
+            return;
+        if (string.IsNullOrWhiteSpace(row.ModUrl) || e.CellStyle == null)
+            return;
+
+        e.CellStyle.ForeColor = _modLinkColor;
+        if (_modLinkFont != null)
+            e.CellStyle.Font = _modLinkFont;
+    }
+
+    private void planesGrid_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex < 0 || e.ColumnIndex < 0)
+            return;
+        if (planesGrid.Columns[e.ColumnIndex].Name != "Mod")
+            return;
+        if (planesGrid.Rows[e.RowIndex].DataBoundItem is not PlaneDataRow row)
+            return;
+        if (string.IsNullOrWhiteSpace(row.ModUrl))
+            return;
+
+        try
+        {
+            Process.Start(new ProcessStartInfo(row.ModUrl) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            Log($"Could not open mod link: {ex.Message}");
+        }
     }
 
     private void scanModsFolderButton_Click(object? sender, EventArgs e)
@@ -374,6 +457,7 @@ public partial class MainForm : Form
                 }
             }
 
+            EnrichPlanesFromAddonDatabase();
             ApplyPlaneFilters();
 
             Log($"Loaded {rows.Count} planes from {jsonPath}");
@@ -618,6 +702,10 @@ public partial class MainForm : Form
                 {
                     _modsOutputFolder = value;
                 }
+                else if (key.Equals("AddonDatabaseUrl", StringComparison.OrdinalIgnoreCase))
+                {
+                    AddonDatabaseService.SetRemoteUrlOverride(value);
+                }
             }
         }
         catch
@@ -655,6 +743,7 @@ public partial class MainForm : Form
     private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
     {
         SaveConfig();
+        _modLinkFont?.Dispose();
     }
 
     private void Log(string message)
@@ -702,11 +791,13 @@ public partial class MainForm : Form
             if (hasSearch)
             {
                 var matchesString = plane.PlaneStringID.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+                var matchesName = plane.PlaneName.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+                var matchesMod = plane.ModText.Contains(searchText, StringComparison.OrdinalIgnoreCase);
                 var matchesId = searchIsNumeric
                     ? plane.PlaneID == searchNumeric
                     : plane.PlaneID.ToString().Contains(searchText, StringComparison.OrdinalIgnoreCase);
 
-                if (!matchesString && !matchesId)
+                if (!matchesString && !matchesName && !matchesMod && !matchesId)
                     continue;
             }
 

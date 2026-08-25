@@ -36,6 +36,8 @@ The program was vibe‑coded with Cursor Pro.
 
 5. **Choose which planes are enabled**
    - Tick or untick the **“Enabled”** checkboxes to turn planes on or off.  
+   - The **Name** column shows friendly plane names from the addon catalog.  
+   - The **Mod** column shows mod pack names; entries with a URL open in your browser when clicked.  
    - Use the search box and the **Hide base game / Hide VR planes** checkboxes to quickly filter the list.
 
 6. **Build the new PAK**
@@ -55,6 +57,14 @@ The program was vibe‑coded with Cursor Pro.
 
 - **Editing the same mod again**
   - If you unpack and edit the same `.pak` again, DisableEnabler reads `DisableEnabler_plane_states.json` to restore your previous on/off choices, making it easy to tweak your setup over time.
+
+- **Addon database (`addon_database.json`)**
+  - Shipped next to `DisableEnabler.exe` and updated automatically from GitHub on startup when a newer `revision` is published.
+  - Maps each `PlaneStringID` to a display **PlaneName**, optional **Notes** (shown in the **Mod** column), and optional **URL** (clickable link in **Mod**).
+  - Planes not listed in the database still appear after Unpack & Load; **Name** and **Mod** stay empty for those rows.
+  - This file is for the tool UI only; it is not packed into game `.pak` files.
+  - **Publish workflow:** edit [`DisableEnabler/addon_database.json`](DisableEnabler/addon_database.json) in the repo, bump `revision`, push to `main`. Users receive the update on the next app start.
+  - Optional override in `DisableEnabler.config`: `AddonDatabaseUrl=https://...` (defaults to the GitHub raw URL for this repo).
 
 - **Safety**
   - Always keep backups of your original `.pak` mod files and your save files.

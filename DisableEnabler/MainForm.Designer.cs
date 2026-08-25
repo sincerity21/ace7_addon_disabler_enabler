@@ -121,7 +121,7 @@ public partial class MainForm
         this.searchTextBox.BorderStyle = BorderStyle.FixedSingle;
         this.searchTextBox.Location = new System.Drawing.Point(12, 118);
         this.searchTextBox.Size = new System.Drawing.Size(508, 24);
-        this.searchTextBox.PlaceholderText = "Search PlaneStringID or PlaneID";
+        this.searchTextBox.PlaceholderText = "Search PlaneStringID, PlaneID, or Name";
         this.searchTextBox.TextChanged += this.searchTextBox_TextChanged;
 
         // planesGrid
@@ -136,7 +136,7 @@ public partial class MainForm
         this.planesGrid.RowHeadersVisible = false;
         this.planesGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         this.planesGrid.MultiSelect = true;
-        this.planesGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        this.planesGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
         this.planesGrid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
         this.planesGrid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
 
@@ -163,15 +163,38 @@ public partial class MainForm
             Name = "PlaneStringID",
             HeaderText = "PlaneStringID",
             DataPropertyName = "PlaneStringID",
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            MinimumWidth = 80,
+            ReadOnly = true
+        };
+        var nameColumn = new DataGridViewTextBoxColumn
+        {
+            Name = "Name",
+            HeaderText = "Name",
+            DataPropertyName = "PlaneName",
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            MinimumWidth = 80,
+            ReadOnly = true
+        };
+        var modColumn = new DataGridViewTextBoxColumn
+        {
+            Name = "Mod",
+            HeaderText = "Mod",
+            DataPropertyName = "ModText",
             AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+            MinimumWidth = 120,
             ReadOnly = true
         };
         this.planesGrid.Columns.Add(enabledColumn);
         this.planesGrid.Columns.Add(planeIdColumn);
         this.planesGrid.Columns.Add(idColumn);
+        this.planesGrid.Columns.Add(nameColumn);
+        this.planesGrid.Columns.Add(modColumn);
         this.planesGrid.CurrentCellDirtyStateChanged += this.planesGrid_CurrentCellDirtyStateChanged;
         this.planesGrid.CellValueChanged += this.planesGrid_CellValueChanged;
         this.planesGrid.CellMouseDown += this.planesGrid_CellMouseDown;
+        this.planesGrid.CellContentClick += this.planesGrid_CellContentClick;
+        this.planesGrid.CellFormatting += this.planesGrid_CellFormatting;
 
         // logTextBox
         this.logTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
