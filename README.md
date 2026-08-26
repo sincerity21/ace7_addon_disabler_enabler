@@ -6,69 +6,54 @@ Under the hood, it works on the game’s `PlayerPlaneDataTable` asset (the data 
 
 Doesn't involve users needing to manually modify files and unpack to disable; just run the tool, untick which planes you want to disable, and it'll do the job.
 
+**Download the program here:** [Nexus Mods — Ace Combat 7 Disable-Enabler](https://www.nexusmods.com/acecombat7skiesunknown/mods/2154?tab=files)
+
 The program was vibe‑coded with Cursor Pro.
 
-### Requirements
+### Requirements (to run a build)
 
-- **UnrealPak Enhanced**
-  - [Download from ModDB](https://www.moddb.com/downloads/unrealpak-enhanced)
-  - After downloading, extract it somewhere easy to find (for example `C:\Tools\UnrealPakEnhanced`) and note where `UnrealPak.exe` is (should be inside `UnrealPakEnhanced\Engine\Binaries\Win64`).
-  - This tool was built and tested against that specific UnrealPak Enhanced build; other versions may not work as intended.
+- **UnrealPak Enhanced** — [Download from ModDB](https://www.moddb.com/downloads/unrealpak-enhanced). Extract it and point the tool at `UnrealPak.exe` (usually under `Engine\Binaries\Win64`). This tool was built and tested against that specific UnrealPak Enhanced build.
+- **Windows 10+** and the **.NET 8 Desktop Runtime (x64)** if the exe does not start: [.NET 8 download](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.419-windows-x64-installer).
 
-- **Windows and .NET**
-  - Windows 10 or newer.
-  - If the program does not start, install the latest **.NET 8 Desktop Runtime (x64)** from the official [.NET 8 page](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.419-windows-x64-installer) and try again.
+### Build yourself
 
-### Using DisableEnabler
+1. **Install the .NET 8 SDK** (Windows x64) from the [.NET download page](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
 
-1. **Start the tool**
-   - Put `DisableEnabler.exe` anywhere you like (for example in a `Tools` or `Mods` folder) and double‑click it to run.
+2. **Clone this repository**
+   ```bash
+   git clone https://github.com/sincerity21/ace7_addon_disabler_enabler.git
+   cd ace7_addon_disabler_enabler
+   ```
 
-2. **Point it at UnrealPak**
-   - Click **“Browse UnrealPak…”**, browse to where you extracted UnrealPak Enhanced, select `UnrealPak.exe`, and click **Open**.  
-     (This is remembered for next time.)
+3. **Build Release**
+   ```bash
+   cd DisableEnabler
+   dotnet build -c Release
+   ```
 
-3. **Pick a mod PAK**
-   - Click **“Choose ~mods”** and pick the folder that contains your mod `.pak` files (usually your `~mods` folder). DisableEnabler will scan that folder, find the `.pak` that contains the “winning” `PlayerPlaneDataTable` (the one that actually takes effect in‑game), and select that PAK for you. You can also type/paste the full path to a `.pak` manually if you prefer.
+4. **Run the output**
+   - Exe and bundled files land in:
+     `DisableEnabler\bin\Release\net8.0-windows\`
+   - Open `DisableEnabler.exe` from that folder (keep `addon_database.json` next to it).
 
-4. **Load the plane list**
-   - Click **“Unpack & Load”**. DisableEnabler unpacks the PAK, finds the plane list, and fills the table with all planes it finds.
+5. **Optional: publish a self-contained folder**
+   ```bash
+   dotnet publish -c Release -r win-x64 --self-contained false
+   ```
+   Output is under `DisableEnabler\bin\Release\net8.0-windows\win-x64\publish\` (adjust if your SDK layout differs).
 
-5. **Choose which planes are enabled**
-   - Tick or untick the **“Enabled”** checkboxes to turn planes on or off.  
-   - The **Name** column shows friendly plane names from the addon catalog.  
-   - The **Mod** column shows mod pack names; entries with a URL open in your browser when clicked.  
-   - Use the search box and the **Hide base game / Hide VR planes** checkboxes to quickly filter the list.
-
-6. **Build the new PAK**
-   - Click **“Apply, Save & Pack”**. DisableEnabler writes the new `*_DisableEnabler_P.pak` into the `~mods` folder you scanned (or next to the source `.pak` if you pasted a path).  
-   - Use **“Open Output Folder”** to jump there. You do not need to copy the file by hand.
+You still need **UnrealPak Enhanced** separately; it is not built by this project.
 
 ### Extra notes
 
-- **Config file**
-  - DisableEnabler stores settings in `DisableEnabler.config` next to the program.
-  - It remembers:
-    - The `UnrealPak.exe` path.
-    - The last scanned mods (`~mods`) folder, used as the pack output location.
-    - Dark mode preference.
-    - Whether to hide base‑game and/or VR planes.
-  - You normally do not need to edit this file by hand.
-
-- **Editing the same mod again**
-  - If you unpack and edit the same `.pak` again, DisableEnabler reads `DisableEnabler_plane_states.json` to restore your previous on/off choices, making it easy to tweak your setup over time.
+- **Config file** — `DisableEnabler.config` next to the exe remembers UnrealPak path, last `~mods` folder, dark mode, and hide filters. Optional: `AddonDatabaseUrl=https://...` to override the GitHub raw update URL.
 
 - **Addon database (`addon_database.json`)**
   - Shipped next to `DisableEnabler.exe` and updated automatically from GitHub on startup when a newer `revision` is published.
-  - Maps each `PlaneStringID` to a display **PlaneName**, optional **Notes** (shown in the **Mod** column), and optional **URL** (clickable link in **Mod**).
-  - Planes not listed in the database still appear after Unpack & Load; **Name** and **Mod** stay empty for those rows.
-  - This file is for the tool UI only; it is not packed into game `.pak` files.
-  - **Publish workflow:** edit [`DisableEnabler/addon_database.json`](DisableEnabler/addon_database.json) in the repo, bump `revision`, push to `main`. Users receive the update on the next app start.
-  - Optional override in `DisableEnabler.config`: `AddonDatabaseUrl=https://...` (defaults to the GitHub raw URL for this repo).
+  - Maps each `PlaneStringID` to **PlaneName**, optional **Notes** (Mod column), and optional **URL** (clickable Mod link).
+  - **Publish workflow:** edit [`DisableEnabler/addon_database.json`](DisableEnabler/addon_database.json), bump `revision`, push to `main`. Users get the update on the next app start.
 
-- **Safety**
-  - Always keep backups of your original `.pak` mod files and your save files.
-  - DisableEnabler only changes the `.pak` files you select; it will not touch the game’s core files unless you explicitly point it at them.
+- **Safety** — Keep backups of original `.pak` mods and saves. The tool only changes the `.pak` files you select.
 
 ### Credits & third‑party code
 
