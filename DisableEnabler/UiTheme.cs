@@ -58,6 +58,12 @@ internal static class UiTheme
     public static Color SecondaryButtonBg(bool dark) =>
         dark ? Color.FromArgb(42, 48, 58) : Color.FromArgb(228, 234, 242);
 
+    public static Color DisabledButtonBg(bool dark) =>
+        dark ? Color.FromArgb(30, 33, 40) : Color.FromArgb(218, 222, 228);
+
+    public static Color DisabledButtonText(bool dark) =>
+        dark ? Color.FromArgb(88, 94, 106) : Color.FromArgb(156, 164, 176);
+
     public static Color LogBg(bool dark) =>
         dark ? Color.FromArgb(18, 20, 24) : Color.FromArgb(252, 252, 253);
 

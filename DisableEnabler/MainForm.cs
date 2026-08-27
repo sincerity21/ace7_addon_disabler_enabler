@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.ComponentModel;
@@ -12,6 +13,13 @@ using Newtonsoft.Json;
 
 namespace DisableEnabler;
 
+internal enum WorkflowStep
+{
+    NoPak,
+    ReadyToUnpack,
+    ReadyToPack
+}
+
 public partial class MainForm : Form
 {
     private readonly BindingList<PlaneDataRow> _planes = new();
@@ -20,6 +28,9 @@ public partial class MainForm : Form
     private static readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DisableEnabler.config");
     private bool _isDarkMode;
     private string? _modsOutputFolder;
+    private WorkflowStep _workflowStep = WorkflowStep.NoPak;
+    private int _pakScanRunning;
+    private bool _pakScanInProgress;
     private Font? _modLinkFont;
     private Color _modLinkColor = Color.Blue;
 
@@ -33,10 +44,13 @@ public partial class MainForm : Form
         _ = CheckAddonDatabaseUpdateAsync();
         ApplyTheme();
         UpdateStatusChips();
-        Shown += (_, _) =>
+        Shown += async (_, _) =>
         {
             EnsureCheckboxColumnFitsDpi();
             LayoutContentColumns();
+            // Brief pause so the themed window paints before the background PPDT scan starts.
+            await Task.Delay(200);
+            await TryAutoScanSavedModsFolderAsync();
         };
     }
 
@@ -170,14 +184,8 @@ public partial class MainForm : Form
 
         StyleSecondaryButton(scanModsFolderButton, dark);
         StyleSecondaryButton(browseUnrealPakButton, dark);
-        StyleSecondaryButton(openOutputFolderButton, dark);
-        StyleSecondaryButton(unpackAndLoadButton, dark);
-        StylePrimaryButton(applyAndSaveButton);
+        UpdateActionButtons();
 
-        // Match action button widths after padding is applied
-        unpackAndLoadButton.Width = 140;
-        applyAndSaveButton.Width = 170;
-        openOutputFolderButton.Width = 165;
         scanModsFolderButton.Width = PathButtonWidth;
         browseUnrealPakButton.Width = PathButtonWidth;
 
@@ -291,17 +299,68 @@ public partial class MainForm : Form
         }
     }
 
-    private static void StylePrimaryButton(Button btn)
+    private void UpdateActionButtons()
+    {
+        var dark = _isDarkMode;
+
+        switch (_workflowStep)
+        {
+            case WorkflowStep.NoPak:
+                StyleWorkflowButton(unpackAndLoadButton, dark, highlighted: false, enabled: false);
+                StyleWorkflowButton(applyAndSaveButton, dark, highlighted: false, enabled: false);
+                StyleWorkflowButton(openOutputFolderButton, dark, highlighted: false, enabled: false);
+                break;
+            case WorkflowStep.ReadyToUnpack:
+                StyleWorkflowButton(unpackAndLoadButton, dark, highlighted: true, enabled: true);
+                StyleWorkflowButton(applyAndSaveButton, dark, highlighted: false, enabled: false);
+                StyleWorkflowButton(openOutputFolderButton, dark, highlighted: false, enabled: false);
+                break;
+            case WorkflowStep.ReadyToPack:
+                StyleWorkflowButton(unpackAndLoadButton, dark, highlighted: false, enabled: false);
+                StyleWorkflowButton(applyAndSaveButton, dark, highlighted: true, enabled: true);
+                StyleWorkflowButton(openOutputFolderButton, dark, highlighted: false, enabled: true);
+                break;
+        }
+
+        unpackAndLoadButton.Width = 140;
+        applyAndSaveButton.Width = 170;
+        openOutputFolderButton.Width = 165;
+        CenterCheckBoxesWithButtons();
+    }
+
+    private static void StyleWorkflowButton(Button btn, bool dark, bool highlighted, bool enabled)
     {
         ApplyButtonBoxMetrics(btn);
         btn.FlatStyle = FlatStyle.Flat;
-        btn.BackColor = UiTheme.Orange;
-        btn.ForeColor = Color.FromArgb(28, 24, 20);
+        btn.Enabled = enabled;
         btn.FlatAppearance.BorderSize = 0;
-        btn.FlatAppearance.MouseOverBackColor = UiTheme.OrangeHover;
-        btn.FlatAppearance.MouseDownBackColor = UiTheme.OrangePressed;
-        btn.Cursor = Cursors.Hand;
         ClearSoftButton(btn);
+
+        if (!enabled)
+        {
+            btn.BackColor = UiTheme.DisabledButtonBg(dark);
+            btn.ForeColor = UiTheme.DisabledButtonText(dark);
+            btn.FlatAppearance.MouseOverBackColor = btn.BackColor;
+            btn.FlatAppearance.MouseDownBackColor = btn.BackColor;
+            btn.Cursor = Cursors.Default;
+            return;
+        }
+
+        btn.Cursor = Cursors.Hand;
+        if (highlighted)
+        {
+            btn.BackColor = UiTheme.Orange;
+            btn.ForeColor = Color.FromArgb(28, 24, 20);
+            btn.FlatAppearance.MouseOverBackColor = UiTheme.OrangeHover;
+            btn.FlatAppearance.MouseDownBackColor = UiTheme.OrangePressed;
+        }
+        else
+        {
+            btn.BackColor = UiTheme.SecondaryButtonBg(dark);
+            btn.ForeColor = UiTheme.TextPrimary(dark);
+            btn.FlatAppearance.MouseOverBackColor = UiTheme.PanelBgAlt(dark);
+            btn.FlatAppearance.MouseDownBackColor = UiTheme.Border(dark);
+        }
     }
 
     private static void StyleSecondaryButton(Button btn, bool dark)
@@ -381,6 +440,13 @@ public partial class MainForm : Form
         var need = TextRenderer.MeasureText(activeModsLabel.Text, activeModsLabel.Font).Width + 48;
         activeModsChip.Width = Math.Max(150, need);
         LayoutHeaderChips();
+
+        if (_pakScanInProgress)
+        {
+            statusValueLabel.Text = "SCANNING";
+            statusValueLabel.ForeColor = UiTheme.Orange;
+            return;
+        }
 
         if (total == 0)
         {
@@ -512,7 +578,7 @@ public partial class MainForm : Form
         }
     }
 
-    private void scanModsFolderButton_Click(object? sender, EventArgs e)
+    private async void scanModsFolderButton_Click(object? sender, EventArgs e)
     {
         try
         {
@@ -535,41 +601,235 @@ public partial class MainForm : Form
             if (fbd.ShowDialog(this) != DialogResult.OK || string.IsNullOrWhiteSpace(fbd.SelectedPath))
                 return;
 
-            var chosenFolder = fbd.SelectedPath;
-            _modsOutputFolder = chosenFolder;
-            SaveConfig();
-            Log($"Choosing PAK from folder: {chosenFolder}");
-
-            string? winningPak;
-            try
-            {
-                winningPak = PakService.FindWinningPlanePakInFolder(unrealPakPath, chosenFolder, Log);
-            }
-            catch (Exception ex)
-            {
-                Log($"Error while choosing PAK: {ex.Message}");
-                MessageBox.Show(this, ex.Message, "Choose PAK failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(winningPak))
-            {
-                MessageBox.Show(this,
-                    "No PAKs with PlayerPlaneDataTable.uasset were found in the selected folder.",
-                    "No matching PAK",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                return;
-            }
-
-            pakPathTextBox.Text = winningPak;
-            Log($"Using winning plane PAK: {winningPak}. You can now click \"Unpack && Load\".");
+            await TrySelectWinningPakFromFolderAsync(fbd.SelectedPath, showDialogs: true);
         }
         catch (Exception ex)
         {
             Log($"Unexpected error during Choose ~mods: {ex.Message}");
             MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+    }
+
+    private async Task TryAutoScanSavedModsFolderAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_modsOutputFolder) || !Directory.Exists(_modsOutputFolder))
+            return;
+
+        var unrealPakPath = unrealPakPathTextBox.Text;
+        if (string.IsNullOrWhiteSpace(unrealPakPath) || !File.Exists(unrealPakPath))
+            return;
+
+        await TrySelectWinningPakFromFolderAsync(_modsOutputFolder, showDialogs: false, isAutoScan: true);
+    }
+
+    private sealed class PakScanResult
+    {
+        public string? WinningPak { get; set; }
+        public string? ErrorMessage { get; set; }
+        public bool NoMatch { get; set; }
+    }
+
+    private static PakScanResult ScanWinningPakInFolder(
+        string unrealPakPath,
+        string chosenFolder,
+        IProgress<string> logProgress)
+    {
+        var result = new PakScanResult();
+        void LogLine(string msg) => logProgress.Report(msg);
+
+        try
+        {
+            var winningPak = PakService.FindWinningPlanePakInFolder(unrealPakPath, chosenFolder, LogLine);
+            if (string.IsNullOrWhiteSpace(winningPak))
+            {
+                result.NoMatch = true;
+                return result;
+            }
+
+            result.WinningPak = winningPak;
+        }
+        catch (Exception ex)
+        {
+            result.ErrorMessage = ex.Message;
+            LogLine($"Error while choosing PAK: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Batches scan log lines onto the UI thread so the window stays responsive during long folder scans.
+    /// </summary>
+    private sealed class StreamingLogProgress : IProgress<string>, IDisposable
+    {
+        private readonly Control _uiRoot;
+        private readonly Action<string> _log;
+        private readonly System.Windows.Forms.Timer _flushTimer;
+        private readonly List<string> _pending = new();
+        private readonly object _lock = new();
+
+        public StreamingLogProgress(Control uiRoot, Action<string> log)
+        {
+            _uiRoot = uiRoot;
+            _log = log;
+            _flushTimer = new System.Windows.Forms.Timer { Interval = 75 };
+            _flushTimer.Tick += (_, _) => FlushPending();
+        }
+
+        public void Report(string value)
+        {
+            lock (_lock)
+                _pending.Add(value);
+
+            if (!_uiRoot.IsHandleCreated || _uiRoot.IsDisposed)
+                return;
+
+            try
+            {
+                _uiRoot.BeginInvoke(EnableTimer);
+            }
+            catch (InvalidOperationException)
+            {
+                // Form is closing.
+            }
+        }
+
+        private void EnableTimer()
+        {
+            if (!_flushTimer.Enabled)
+                _flushTimer.Start();
+        }
+
+        public void Flush()
+        {
+            if (_uiRoot.InvokeRequired)
+            {
+                try
+                {
+                    _uiRoot.Invoke(Flush);
+                }
+                catch (InvalidOperationException)
+                {
+                    // Form is closing.
+                }
+
+                return;
+            }
+
+            FlushPending();
+        }
+
+        private void FlushPending()
+        {
+            List<string> batch;
+            lock (_lock)
+            {
+                if (_pending.Count == 0)
+                {
+                    _flushTimer.Stop();
+                    return;
+                }
+
+                batch = new List<string>(_pending);
+                _pending.Clear();
+            }
+
+            foreach (var line in batch)
+                _log(line);
+        }
+
+        public void Dispose()
+        {
+            _flushTimer.Stop();
+            _flushTimer.Dispose();
+        }
+    }
+
+    private async Task<bool> TrySelectWinningPakFromFolderAsync(
+        string chosenFolder,
+        bool showDialogs,
+        bool isAutoScan = false)
+    {
+        var unrealPakPath = unrealPakPathTextBox.Text;
+        if (string.IsNullOrWhiteSpace(unrealPakPath) || !File.Exists(unrealPakPath))
+        {
+            if (showDialogs)
+                MessageBox.Show(this, "Select a valid UnrealPak.exe first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(chosenFolder) || !Directory.Exists(chosenFolder))
+            return false;
+
+        if (Interlocked.CompareExchange(ref _pakScanRunning, 1, 0) != 0)
+            return false;
+
+        _modsOutputFolder = chosenFolder;
+        SaveConfig();
+
+        if (isAutoScan)
+            Log($"Auto-scanning saved ~mods folder: {chosenFolder}");
+        else
+            Log($"Choosing PAK from folder: {chosenFolder}");
+
+        PakScanResult scanResult;
+        StreamingLogProgress? logProgress = null;
+        try
+        {
+            _pakScanInProgress = true;
+            UpdateStatusChips();
+            await Task.Yield();
+
+            logProgress = new StreamingLogProgress(this, Log);
+            scanResult = await Task.Run(() => ScanWinningPakInFolder(unrealPakPath, chosenFolder, logProgress));
+        }
+        finally
+        {
+            logProgress?.Flush();
+            logProgress?.Dispose();
+            _pakScanInProgress = false;
+            Interlocked.Exchange(ref _pakScanRunning, 0);
+        }
+
+        if (IsDisposed)
+            return false;
+
+        UpdateStatusChips();
+
+        if (!string.IsNullOrWhiteSpace(scanResult.ErrorMessage))
+        {
+            if (showDialogs)
+                MessageBox.Show(this, scanResult.ErrorMessage, "Choose PAK failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false;
+        }
+
+        if (scanResult.NoMatch || string.IsNullOrWhiteSpace(scanResult.WinningPak))
+        {
+            if (showDialogs)
+            {
+                MessageBox.Show(this,
+                    "No PAKs with PlayerPlaneDataTable.uasset were found in the selected folder.",
+                    "No matching PAK",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            else
+            {
+                Log("No PAKs with PlayerPlaneDataTable.uasset were found in the saved ~mods folder.");
+            }
+
+            return false;
+        }
+
+        pakPathTextBox.Text = scanResult.WinningPak;
+        _workflowStep = WorkflowStep.ReadyToUnpack;
+        _planes.Clear();
+        _allPlanes.Clear();
+        ApplyPlaneFilters();
+        UpdateStatusChips();
+        UpdateActionButtons();
+        Log($"Using winning plane PAK: {scanResult.WinningPak}. You can now click \"Unpack && Load\".");
+        return true;
     }
 
     private void browseUnrealPakButton_Click(object? sender, EventArgs e)
@@ -584,6 +844,7 @@ public partial class MainForm : Form
             unrealPakPathTextBox.Text = ofd.FileName;
             Log($"Selected UnrealPak.exe: {ofd.FileName}");
             SaveConfig();
+            _ = TryAutoScanSavedModsFolderAsync();
         }
     }
 
@@ -655,6 +916,8 @@ public partial class MainForm : Form
             EnrichPlanesFromAddonDatabase();
             ApplyPlaneFilters();
             UpdateStatusChips();
+            _workflowStep = WorkflowStep.ReadyToPack;
+            UpdateActionButtons();
 
             Log($"Loaded {rows.Count} planes from {jsonPath}");
         }
@@ -955,6 +1218,9 @@ public partial class MainForm : Form
         {
             logTextBox.AppendText(Environment.NewLine + line);
         }
+
+        logTextBox.SelectionStart = logTextBox.TextLength;
+        logTextBox.ScrollToCaret();
     }
 
     private void ApplyPlaneFilters()
