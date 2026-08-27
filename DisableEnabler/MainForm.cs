@@ -32,7 +32,12 @@ public partial class MainForm : Form
         AddonDatabaseService.LoadLocal(Log);
         _ = CheckAddonDatabaseUpdateAsync();
         ApplyTheme();
-        Shown += (_, _) => EnsureCheckboxColumnFitsDpi();
+        UpdateStatusChips();
+        Shown += (_, _) =>
+        {
+            EnsureCheckboxColumnFitsDpi();
+            LayoutContentColumns();
+        };
     }
 
     private async Task CheckAddonDatabaseUpdateAsync()
@@ -60,7 +65,7 @@ public partial class MainForm : Form
         if (planesGrid.Columns["Enabled"] is not DataGridViewCheckBoxColumn enabledCol)
             return;
 
-        enabledCol.HeaderText = "Enabled";
+        enabledCol.HeaderText = "Active";
 
         // Designer used 30px at 96 DPI; scale for the glyph, then grow enough for the header text.
         var minW = Math.Max(48, (int)Math.Ceiling(48.0 * DeviceDpi / 96.0));
@@ -112,91 +117,281 @@ public partial class MainForm : Form
 
     private void ApplyTheme()
     {
-        var formBackColor = _isDarkMode ? Color.FromArgb(38, 38, 38) : SystemColors.Control;
-        var formForeColor = _isDarkMode ? Color.WhiteSmoke : SystemColors.ControlText;
+        var dark = _isDarkMode;
+        BackColor = UiTheme.AppBg(dark);
+        ForeColor = UiTheme.TextPrimary(dark);
+        rootLayout.BackColor = UiTheme.AppBg(dark);
 
-        BackColor = formBackColor;
-        ForeColor = formForeColor;
+        StylePanel(headerPanel, dark, separator: false);
+        headerPanel.BackColor = UiTheme.AppBg(dark);
+        StylePanel(pathsPanel, dark, separator: false);
+        pathsPanel.BackColor = UiTheme.AppBg(dark);
+        StylePanel(actionsPanel, dark, separator: false);
+        actionsPanel.BackColor = UiTheme.AppBg(dark);
+        actionsLayout.BackColor = UiTheme.AppBg(dark);
+        actionsLeft.BackColor = UiTheme.AppBg(dark);
+        actionsRight.BackColor = UiTheme.AppBg(dark);
+        if (actionsLayout.GetControlFromPosition(1, 0) is Control mid)
+            mid.BackColor = UiTheme.AppBg(dark);
 
-        ApplyThemeToControl(this);
+        StylePanel(searchPanel, dark, separator: false);
+        searchPanel.BackColor = UiTheme.AppBg(dark);
+        StylePanel(logPanel, dark, separator: false);
+        logPanel.BackColor = UiTheme.AppBg(dark);
+        StyleChip(activeModsChip, dark, cyanBorder: true);
+        StyleChip(statusChip, dark, cyanBorder: false);
 
-        if (planesGrid != null)
+        titleLabel.ForeColor = UiTheme.TextPrimary(dark);
+        titleLabel.BackColor = Color.Transparent;
+        subtitleLabel.ForeColor = UiTheme.TextMuted(dark);
+        subtitleLabel.BackColor = Color.Transparent;
+
+        activeModsLabel.ForeColor = UiTheme.TextPrimary(dark);
+        activeModsLabel.BackColor = Color.Transparent;
+        activeModsDot.BackColor = Color.Transparent;
+        activeModsDot.Paint -= ActiveModsDot_Paint;
+        activeModsDot.Paint += ActiveModsDot_Paint;
+        activeModsDot.Invalidate();
+
+        statusPrefixLabel.ForeColor = UiTheme.TextMuted(dark);
+        statusPrefixLabel.BackColor = Color.Transparent;
+        statusValueLabel.ForeColor = UiTheme.Orange;
+        statusValueLabel.BackColor = Color.Transparent;
+
+        modsPathLabel.ForeColor = UiTheme.TextMuted(dark);
+        modsPathLabel.BackColor = Color.Transparent;
+        unrealPakLabel.ForeColor = UiTheme.TextMuted(dark);
+        unrealPakLabel.BackColor = Color.Transparent;
+
+        StylePathField(pakPathTextBox, dark);
+        StylePathField(unrealPakPathTextBox, dark);
+        StyleTextBox(searchTextBox, dark);
+        StyleTextBox(logTextBox, dark, isLog: true);
+
+        StyleSecondaryButton(scanModsFolderButton, dark);
+        StyleSecondaryButton(browseUnrealPakButton, dark);
+        StyleSecondaryButton(openOutputFolderButton, dark);
+        StyleSecondaryButton(unpackAndLoadButton, dark);
+        StylePrimaryButton(applyAndSaveButton);
+
+        // Match action button widths after padding is applied
+        unpackAndLoadButton.Width = 140;
+        applyAndSaveButton.Width = 170;
+        openOutputFolderButton.Width = 165;
+        scanModsFolderButton.Width = PathButtonWidth;
+        browseUnrealPakButton.Width = PathButtonWidth;
+
+        StyleCheckBox(darkModeCheckBox, dark);
+        StyleCheckBox(hideBaseGameCheckBox, dark);
+        StyleCheckBox(hideVrPlanesCheckBox, dark);
+        CenterCheckBoxesWithButtons();
+
+        logTitleLabel.ForeColor = UiTheme.TextMuted(dark);
+        logTitleLabel.BackColor = Color.Transparent;
+
+        ApplyThemeToDataGridView(planesGrid);
+        UpdateStatusChips();
+        LayoutContentColumns();
+    }
+
+    private void ActiveModsDot_Paint(object? sender, PaintEventArgs e)
+    {
+        if (sender is not Panel dot)
+            return;
+        e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        using var brush = new SolidBrush(UiTheme.Success);
+        e.Graphics.FillEllipse(brush, 0, 0, dot.Width - 1, dot.Height - 1);
+    }
+
+    private static void StylePanel(Panel panel, bool dark, bool separator)
+    {
+        panel.BackColor = UiTheme.PanelBg(dark);
+        panel.BorderStyle = BorderStyle.None;
+        // Bottom hairline only — avoids double borders and fullscreen vertical edge artifacts.
+        panel.Tag = separator ? UiTheme.Border(dark) : null;
+        panel.Paint -= PanelSeparator_Paint;
+        panel.Paint += PanelSeparator_Paint;
+        panel.Invalidate();
+    }
+
+    private static void StyleChip(Panel panel, bool dark, bool cyanBorder)
+    {
+        panel.BackColor = UiTheme.PanelBg(dark);
+        panel.BorderStyle = BorderStyle.None;
+        panel.Region = null;
+        panel.Tag = cyanBorder ? UiTheme.CyanDim(dark) : UiTheme.Border(dark);
+        panel.Paint -= PanelChipBorder_Paint;
+        panel.Paint += PanelChipBorder_Paint;
+        panel.Resize -= SoftChip_Resize;
+        panel.Invalidate();
+    }
+
+    private static void SoftChip_Resize(object? sender, EventArgs e)
+    {
+        // Kept for compatibility; chips use hard corners again.
+    }
+
+    private static void PanelSeparator_Paint(object? sender, PaintEventArgs e)
+    {
+        if (sender is not Panel panel || panel.Tag is not Color lineColor)
+            return;
+
+        using var pen = new Pen(Color.FromArgb(80, lineColor), 1);
+        var y = panel.ClientSize.Height - 1;
+        e.Graphics.DrawLine(pen, 0, y, panel.ClientSize.Width, y);
+    }
+
+    private static void PanelChipBorder_Paint(object? sender, PaintEventArgs e)
+    {
+        if (sender is not Panel panel || panel.Tag is not Color borderColor)
+            return;
+
+        using var pen = new Pen(Color.FromArgb(130, borderColor), 1);
+        var r = panel.ClientRectangle;
+        e.Graphics.DrawRectangle(pen, 0, 0, r.Width - 1, r.Height - 1);
+    }
+
+    private static void StylePathField(CenteredPathTextBox field, bool dark)
+    {
+        field.ApplyFieldColors(UiTheme.InputBg(dark), UiTheme.TextPrimary(dark));
+    }
+
+    private static void StyleTextBox(TextBox box, bool dark, bool isLog = false)
+    {
+        box.BackColor = isLog ? UiTheme.LogBg(dark) : UiTheme.InputBg(dark);
+        box.ForeColor = UiTheme.TextPrimary(dark);
+        box.BorderStyle = BorderStyle.FixedSingle;
+        if (!isLog)
+            box.Height = box.PreferredHeight;
+    }
+
+    private static void StyleCheckBox(CheckBox box, bool dark)
+    {
+        box.FlatStyle = FlatStyle.Standard;
+        box.UseVisualStyleBackColor = false;
+        box.BackColor = UiTheme.AppBg(dark);
+        box.ForeColor = UiTheme.TextMuted(dark);
+        box.AutoCheck = true;
+        box.Enabled = true;
+    }
+
+    private void CenterCheckBoxesWithButtons()
+    {
+        // Match action-button height so checkbox labels sit on the same baseline.
+        var btnH = Math.Max(
+            Math.Max(unpackAndLoadButton.Height, applyAndSaveButton.Height),
+            openOutputFolderButton.Height);
+        foreach (var cb in new[] { hideBaseGameCheckBox, hideVrPlanesCheckBox, darkModeCheckBox })
         {
-            ApplyThemeToDataGridView(planesGrid);
+            var textW = TextRenderer.MeasureText(cb.Text, cb.Font).Width;
+            cb.AutoSize = false;
+            cb.Size = new Size(textW + SystemInformation.MenuCheckSize.Width + 12, btnH);
+            cb.TextAlign = ContentAlignment.MiddleLeft;
+            cb.Margin = new Padding(0, 0, cb == darkModeCheckBox ? 0 : 16, 0);
         }
     }
 
-    private void ApplyThemeToControl(Control control)
+    private static void StylePrimaryButton(Button btn)
     {
-        if (control is DataGridView)
-        {
-            // Handled separately
-        }
-        else         if (control is TextBox)
-        {
-            control.BackColor = _isDarkMode ? Color.FromArgb(45, 45, 45) : Color.FromArgb(252, 252, 252);
-            control.ForeColor = _isDarkMode ? Color.WhiteSmoke : SystemColors.WindowText;
-        }
-        else if (control is Button btn)
-        {
-            btn.BackColor = _isDarkMode ? Color.FromArgb(50, 50, 50) : SystemColors.Control;
-            btn.ForeColor = _isDarkMode ? Color.WhiteSmoke : SystemColors.ControlText;
-            if (btn.FlatStyle == FlatStyle.Flat)
-            {
-                btn.FlatAppearance.BorderColor = _isDarkMode ? Color.FromArgb(70, 70, 70) : SystemColors.ControlDark;
-                btn.FlatAppearance.BorderSize = 1;
-            }
-        }
-        else if (control is CheckBox)
-        {
-            control.BackColor = _isDarkMode ? Color.FromArgb(45, 45, 45) : SystemColors.Control;
-            control.ForeColor = _isDarkMode ? Color.WhiteSmoke : SystemColors.ControlText;
-        }
-        else
-        {
-            control.BackColor = _isDarkMode ? Color.FromArgb(38, 38, 38) : SystemColors.Control;
-            control.ForeColor = _isDarkMode ? Color.WhiteSmoke : SystemColors.ControlText;
-        }
+        ApplyButtonBoxMetrics(btn);
+        btn.FlatStyle = FlatStyle.Flat;
+        btn.BackColor = UiTheme.Orange;
+        btn.ForeColor = Color.FromArgb(28, 24, 20);
+        btn.FlatAppearance.BorderSize = 0;
+        btn.FlatAppearance.MouseOverBackColor = UiTheme.OrangeHover;
+        btn.FlatAppearance.MouseDownBackColor = UiTheme.OrangePressed;
+        btn.Cursor = Cursors.Hand;
+        ClearSoftButton(btn);
+    }
 
-        foreach (Control child in control.Controls)
-        {
-            ApplyThemeToControl(child);
-        }
+    private static void StyleSecondaryButton(Button btn, bool dark)
+    {
+        ApplyButtonBoxMetrics(btn);
+        btn.FlatStyle = FlatStyle.Flat;
+        btn.BackColor = UiTheme.SecondaryButtonBg(dark);
+        btn.ForeColor = UiTheme.TextPrimary(dark);
+        btn.FlatAppearance.BorderSize = 0;
+        btn.FlatAppearance.MouseOverBackColor = UiTheme.PanelBgAlt(dark);
+        btn.FlatAppearance.MouseDownBackColor = UiTheme.Border(dark);
+        btn.Cursor = Cursors.Hand;
+        ClearSoftButton(btn);
+    }
+
+    private static void ClearSoftButton(Button btn)
+    {
+        btn.Resize -= SoftButton_Resize;
+        btn.Region = null;
+    }
+
+    private static void SoftButton_Resize(object? sender, EventArgs e)
+    {
+        // Unused — hard corners restored.
+    }
+
+    private static void ApplyButtonBoxMetrics(Button btn)
+    {
+        btn.AutoSize = false;
+        btn.TextAlign = ContentAlignment.MiddleCenter;
+        btn.Padding = new Padding(BoxPadX + 2, 0, BoxPadX + 2, 0);
+        btn.UseCompatibleTextRendering = false;
+        btn.Height = MeasureSingleLineBoxHeight(btn.Font);
     }
 
     private void ApplyThemeToDataGridView(DataGridView grid)
     {
-        _modLinkColor = _isDarkMode ? Color.FromArgb(100, 180, 255) : Color.Blue;
+        var dark = _isDarkMode;
+        _modLinkColor = UiTheme.Cyan(dark);
 
-        if (_isDarkMode)
-        {
-            grid.BackgroundColor = Color.FromArgb(38, 38, 38);
-            grid.GridColor = Color.FromArgb(60, 60, 60);
-            grid.DefaultCellStyle.BackColor = Color.FromArgb(45, 45, 45);
-            grid.DefaultCellStyle.ForeColor = Color.WhiteSmoke;
-            grid.DefaultCellStyle.SelectionBackColor = Color.SteelBlue;
-            grid.DefaultCellStyle.SelectionForeColor = Color.White;
+        grid.BackgroundColor = UiTheme.AppBg(dark);
+        grid.GridColor = UiTheme.Border(dark);
+        grid.BorderStyle = BorderStyle.None;
+        grid.EnableHeadersVisualStyles = false;
+        grid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+        grid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+        grid.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
 
-            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(50, 50, 50);
-            grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.WhiteSmoke;
-            grid.EnableHeadersVisualStyles = false;
-        }
-        else
-        {
-            grid.BackgroundColor = Color.FromArgb(252, 252, 252);
-            grid.GridColor = Color.FromArgb(220, 220, 220);
-            grid.DefaultCellStyle.BackColor = SystemColors.Window;
-            grid.DefaultCellStyle.ForeColor = SystemColors.ControlText;
-            grid.DefaultCellStyle.SelectionBackColor = SystemColors.Highlight;
-            grid.DefaultCellStyle.SelectionForeColor = SystemColors.HighlightText;
+        grid.ColumnHeadersDefaultCellStyle.BackColor = UiTheme.PanelBg(dark);
+        grid.ColumnHeadersDefaultCellStyle.ForeColor = UiTheme.TextMuted(dark);
+        grid.ColumnHeadersDefaultCellStyle.SelectionBackColor = UiTheme.PanelBg(dark);
+        grid.ColumnHeadersDefaultCellStyle.SelectionForeColor = UiTheme.TextMuted(dark);
+        grid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+        grid.ColumnHeadersDefaultCellStyle.Padding = new Padding(6, 4, 6, 4);
 
-            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240);
-            grid.ColumnHeadersDefaultCellStyle.ForeColor = SystemColors.ControlText;
-            grid.EnableHeadersVisualStyles = false;
-        }
+        grid.DefaultCellStyle.BackColor = UiTheme.GridRow(dark);
+        grid.DefaultCellStyle.ForeColor = UiTheme.TextPrimary(dark);
+        grid.DefaultCellStyle.SelectionBackColor = UiTheme.SelectionBg(dark);
+        grid.DefaultCellStyle.SelectionForeColor = UiTheme.TextPrimary(dark);
+        grid.DefaultCellStyle.Padding = new Padding(4, 2, 4, 2);
+        grid.AlternatingRowsDefaultCellStyle.BackColor = UiTheme.GridRowAlt(dark);
+        grid.AlternatingRowsDefaultCellStyle.ForeColor = UiTheme.TextPrimary(dark);
+        grid.AlternatingRowsDefaultCellStyle.SelectionBackColor = UiTheme.SelectionBg(dark);
+        grid.AlternatingRowsDefaultCellStyle.SelectionForeColor = UiTheme.TextPrimary(dark);
 
         _modLinkFont?.Dispose();
         _modLinkFont = new Font(grid.Font, FontStyle.Underline);
+    }
+
+    private void UpdateStatusChips()
+    {
+        var total = _allPlanes.Count;
+        var active = _allPlanes.Count(p => p.Enabled);
+        activeModsLabel.Text = $"{active} / {total} ACTIVE";
+
+        // Grow chip to fit text with padding
+        var need = TextRenderer.MeasureText(activeModsLabel.Text, activeModsLabel.Font).Width + 48;
+        activeModsChip.Width = Math.Max(150, need);
+        LayoutHeaderChips();
+
+        if (total == 0)
+        {
+            statusValueLabel.Text = "IDLE";
+            statusValueLabel.ForeColor = UiTheme.TextMuted(_isDarkMode);
+        }
+        else
+        {
+            statusValueLabel.Text = "TARGET READY";
+            statusValueLabel.ForeColor = UiTheme.Orange;
+        }
     }
 
     private void filterCheckBox_CheckedChanged(object? sender, EventArgs e)
@@ -277,6 +472,7 @@ public partial class MainForm : Form
 
         planesGrid.Refresh();
         _selectedRowIndexes.Clear();
+        UpdateStatusChips();
     }
 
     private void planesGrid_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
@@ -410,8 +606,7 @@ public partial class MainForm : Form
                 return;
             }
 
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            var unpackDir = Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
+            var unpackDir = GetUnpackDirectory(pakPath);
 
             PakService.ExtractPak(unrealPakPath, pakPath, unpackDir, Log);
 
@@ -459,6 +654,7 @@ public partial class MainForm : Form
 
             EnrichPlanesFromAddonDatabase();
             ApplyPlaneFilters();
+            UpdateStatusChips();
 
             Log($"Loaded {rows.Count} planes from {jsonPath}");
         }
@@ -492,8 +688,7 @@ public partial class MainForm : Form
                 return false;
             }
 
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            var unpackDir = Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
+            var unpackDir = GetUnpackDirectory(pakPath);
 
             var assetPath = PlaneDataService.FindPlayerPlaneDataTable(unpackDir);
             var assetDir = Path.GetDirectoryName(assetPath) ?? unpackDir;
@@ -591,8 +786,7 @@ public partial class MainForm : Form
             {
                 outputFileName = new string('~', 5) + outputFileName;
             }
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            var unpackDir = Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
+            var unpackDir = GetUnpackDirectory(pakPath);
             var outputDir = GetPackedPakOutputDirectory(pakPath);
             var outputPakPath = Path.Combine(outputDir, outputFileName);
 
@@ -623,22 +817,27 @@ public partial class MainForm : Form
             return;
         }
 
-        var outputDir = GetPackedPakOutputDirectory(pakPath);
+        var unpackDir = GetUnpackDirectory(pakPath);
 
-        if (!Directory.Exists(outputDir))
+        if (!Directory.Exists(unpackDir))
         {
-            MessageBox.Show(this, "Output folder does not exist yet.", "Info", MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
+            MessageBox.Show(this, "Unpacked folder does not exist yet. Run Unpack & Load first.", "Info",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
-        Process.Start("explorer.exe", outputDir);
-        Log($"Opened output folder: {outputDir}");
+        Process.Start("explorer.exe", unpackDir);
+        Log($"Opened unpacked folder: {unpackDir}");
+    }
+
+    private static string GetUnpackDirectory(string pakPath)
+    {
+        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        return Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
     }
 
     /// <summary>
     /// Packed PAKs go into the scanned ~mods folder when available; otherwise next to the source PAK.
-    /// Unpack working files stay next to the program.
     /// </summary>
     private string GetPackedPakOutputDirectory(string pakPath)
     {
@@ -649,8 +848,7 @@ public partial class MainForm : Form
         if (!string.IsNullOrWhiteSpace(pakDir) && Directory.Exists(pakDir))
             return pakDir;
 
-        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        return Path.Combine(baseDir, Path.GetFileNameWithoutExtension(pakPath) + "_unpacked");
+        return AppDomain.CurrentDomain.BaseDirectory;
     }
 
     private void searchTextBox_TextChanged(object? sender, EventArgs e)
@@ -764,7 +962,10 @@ public partial class MainForm : Form
         _planes.Clear();
 
         if (_allPlanes.Count == 0)
+        {
+            UpdateStatusChips();
             return;
+        }
 
         var hideBase = hideBaseGameCheckBox.Checked;
         var hideVr = hideVrPlanesCheckBox.Checked;
@@ -805,6 +1006,7 @@ public partial class MainForm : Form
         }
 
         EnsureCheckboxColumnFitsDpi();
+        UpdateStatusChips();
     }
 }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -5,231 +6,450 @@ namespace DisableEnabler;
 
 public partial class MainForm
 {
-    private TextBox pakPathTextBox = null!;
+    private const int ContentPad = 12;
+    private const int PathButtonWidth = 140;
+    private const int Gap = 8;
+    private const int BoxPadY = 4;
+    private const int BoxPadX = 10;
+
+    private TableLayoutPanel rootLayout = null!;
+    private Panel headerPanel = null!;
+    private Label titleLabel = null!;
+    private Label subtitleLabel = null!;
+    private Panel activeModsChip = null!;
+    private Panel activeModsDot = null!;
+    private Label activeModsLabel = null!;
+    private Panel statusChip = null!;
+    private Label statusPrefixLabel = null!;
+    private Label statusValueLabel = null!;
+
+    private Panel pathsPanel = null!;
+    private Label modsPathLabel = null!;
+    private CenteredPathTextBox pakPathTextBox = null!;
     private Button scanModsFolderButton = null!;
-    private TextBox unrealPakPathTextBox = null!;
+    private Label unrealPakLabel = null!;
+    private CenteredPathTextBox unrealPakPathTextBox = null!;
     private Button browseUnrealPakButton = null!;
+
+    private Panel actionsPanel = null!;
+    private TableLayoutPanel actionsLayout = null!;
+    private FlowLayoutPanel actionsLeft = null!;
+    private FlowLayoutPanel actionsRight = null!;
     private Button unpackAndLoadButton = null!;
     private Button applyAndSaveButton = null!;
     private Button openOutputFolderButton = null!;
     private CheckBox hideBaseGameCheckBox = null!;
     private CheckBox hideVrPlanesCheckBox = null!;
-    private TextBox searchTextBox = null!;
-    private DataGridView planesGrid = null!;
-    private TextBox logTextBox = null!;
     private CheckBox darkModeCheckBox = null!;
+
+    private Panel searchPanel = null!;
+    private TextBox searchTextBox = null!;
+
+    private DataGridView planesGrid = null!;
+
+    private Panel logPanel = null!;
+    private Label logTitleLabel = null!;
+    private TextBox logTextBox = null!;
 
     private void InitializeComponent()
     {
-        this.pakPathTextBox = new TextBox();
-        this.scanModsFolderButton = new Button();
-        this.unrealPakPathTextBox = new TextBox();
-        this.browseUnrealPakButton = new Button();
-        this.unpackAndLoadButton = new Button();
-        this.applyAndSaveButton = new Button();
-        this.openOutputFolderButton = new Button();
-        this.hideBaseGameCheckBox = new CheckBox();
-        this.hideVrPlanesCheckBox = new CheckBox();
-        this.searchTextBox = new TextBox();
-        this.planesGrid = new DataGridView();
-        this.logTextBox = new TextBox();
-        this.darkModeCheckBox = new CheckBox();
+        rootLayout = new TableLayoutPanel();
+        headerPanel = new Panel();
+        titleLabel = new Label();
+        subtitleLabel = new Label();
+        activeModsChip = new Panel();
+        activeModsDot = new Panel();
+        activeModsLabel = new Label();
+        statusChip = new Panel();
+        statusPrefixLabel = new Label();
+        statusValueLabel = new Label();
 
-        ((System.ComponentModel.ISupportInitialize)(this.planesGrid)).BeginInit();
-        this.SuspendLayout();
+        pathsPanel = new Panel();
+        modsPathLabel = new Label();
+        pakPathTextBox = new CenteredPathTextBox();
+        scanModsFolderButton = new Button();
+        unrealPakLabel = new Label();
+        unrealPakPathTextBox = new CenteredPathTextBox();
+        browseUnrealPakButton = new Button();
 
-        // pakPathTextBox
-        this.pakPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        this.pakPathTextBox.BorderStyle = BorderStyle.FixedSingle;
-        this.pakPathTextBox.Location = new System.Drawing.Point(12, 12);
-        this.pakPathTextBox.Size = new System.Drawing.Size(478, 24);
+        actionsPanel = new Panel();
+        actionsLayout = new TableLayoutPanel();
+        actionsLeft = new FlowLayoutPanel();
+        actionsRight = new FlowLayoutPanel();
+        unpackAndLoadButton = new Button();
+        applyAndSaveButton = new Button();
+        openOutputFolderButton = new Button();
+        hideBaseGameCheckBox = new CheckBox();
+        hideVrPlanesCheckBox = new CheckBox();
+        darkModeCheckBox = new CheckBox();
 
-        // scanModsFolderButton
-        this.scanModsFolderButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-        this.scanModsFolderButton.FlatStyle = FlatStyle.Flat;
-        this.scanModsFolderButton.Location = new System.Drawing.Point(498, 11);
-        this.scanModsFolderButton.Size = new System.Drawing.Size(120, 28);
-        this.scanModsFolderButton.Text = "Choose ~mods";
-        this.scanModsFolderButton.UseMnemonic = false;
-        this.scanModsFolderButton.Click += this.scanModsFolderButton_Click;
+        searchPanel = new Panel();
+        searchTextBox = new TextBox();
 
-        // unrealPakPathTextBox
-        this.unrealPakPathTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        this.unrealPakPathTextBox.BorderStyle = BorderStyle.FixedSingle;
-        this.unrealPakPathTextBox.Location = new System.Drawing.Point(12, 44);
-        this.unrealPakPathTextBox.Size = new System.Drawing.Size(478, 24);
+        planesGrid = new DataGridView();
+        logPanel = new Panel();
+        logTitleLabel = new Label();
+        logTextBox = new TextBox();
 
-        // browseUnrealPakButton
-        this.browseUnrealPakButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-        this.browseUnrealPakButton.FlatStyle = FlatStyle.Flat;
-        this.browseUnrealPakButton.Location = new System.Drawing.Point(498, 42);
-        this.browseUnrealPakButton.Size = new System.Drawing.Size(120, 28);
-        this.browseUnrealPakButton.Text = "Browse EXE";
-        this.browseUnrealPakButton.Click += this.browseUnrealPakButton_Click;
+        ((System.ComponentModel.ISupportInitialize)planesGrid).BeginInit();
+        SuspendLayout();
+        rootLayout.SuspendLayout();
+        headerPanel.SuspendLayout();
+        pathsPanel.SuspendLayout();
+        actionsPanel.SuspendLayout();
+        actionsLayout.SuspendLayout();
+        actionsLeft.SuspendLayout();
+        actionsRight.SuspendLayout();
+        searchPanel.SuspendLayout();
+        logPanel.SuspendLayout();
 
-        // unpackAndLoadButton
-        this.unpackAndLoadButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.unpackAndLoadButton.FlatStyle = FlatStyle.Flat;
-        this.unpackAndLoadButton.Location = new System.Drawing.Point(12, 82);
-        this.unpackAndLoadButton.Size = new System.Drawing.Size(120, 28);
-        this.unpackAndLoadButton.Text = "Unpack && Load";
-        this.unpackAndLoadButton.Click += this.unpackAndLoadButton_Click;
+        rootLayout.ColumnCount = 1;
+        rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        rootLayout.Dock = DockStyle.Fill;
+        rootLayout.Padding = new Padding(16);
+        rootLayout.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
+        rootLayout.RowCount = 6;
+        rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 64F));
+        rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 128F));
+        rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 56F));
+        rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 44F));
+        rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 132F));
 
-        // applyAndSaveButton
-        this.applyAndSaveButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.applyAndSaveButton.FlatStyle = FlatStyle.Flat;
-        this.applyAndSaveButton.Location = new System.Drawing.Point(138, 82);
-        this.applyAndSaveButton.Size = new System.Drawing.Size(140, 28);
-        this.applyAndSaveButton.Text = "Apply, Save && Pack";
-        this.applyAndSaveButton.Click += this.applyAndSaveButton_Click;
+        // header
+        headerPanel.Dock = DockStyle.Fill;
+        headerPanel.Margin = new Padding(0);
+        titleLabel.AutoSize = true;
+        titleLabel.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+        titleLabel.Location = new Point(ContentPad, 4);
+        titleLabel.Text = "THE DISABLE-ENABLER";
+        subtitleLabel.AutoSize = true;
+        subtitleLabel.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+        subtitleLabel.Location = new Point(ContentPad, 36);
+        subtitleLabel.Text = "AN ADD-ON MANAGEMENT TOOL BY SINCERITY";
 
-        // openOutputFolderButton
-        this.openOutputFolderButton.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.openOutputFolderButton.FlatStyle = FlatStyle.Flat;
-        this.openOutputFolderButton.Location = new System.Drawing.Point(284, 82);
-        this.openOutputFolderButton.Size = new System.Drawing.Size(140, 28);
-        this.openOutputFolderButton.Text = "Open Output Folder";
-        this.openOutputFolderButton.Click += this.openOutputFolderButton_Click;
+        activeModsChip.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        activeModsChip.Size = new Size(170, 30);
+        activeModsDot.Size = new Size(10, 10);
+        activeModsDot.Location = new Point(12, 10);
+        activeModsLabel.AutoSize = true;
+        activeModsLabel.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+        activeModsLabel.Location = new Point(28, 7);
+        activeModsLabel.Text = "0 / 0 ACTIVE";
+        activeModsChip.Controls.Add(activeModsDot);
+        activeModsChip.Controls.Add(activeModsLabel);
 
-        // hideBaseGameCheckBox
-        this.hideBaseGameCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.hideBaseGameCheckBox.AutoSize = true;
-        this.hideBaseGameCheckBox.Location = new System.Drawing.Point(526, 76);
-        this.hideBaseGameCheckBox.Text = "Hide Base Game";
-        this.hideBaseGameCheckBox.Checked = true;
-        this.hideBaseGameCheckBox.CheckState = CheckState.Checked;
-        this.hideBaseGameCheckBox.CheckedChanged += this.filterCheckBox_CheckedChanged;
+        statusChip.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        statusChip.Size = new Size(200, 30);
+        statusPrefixLabel.AutoSize = true;
+        statusPrefixLabel.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+        statusPrefixLabel.Location = new Point(12, 7);
+        statusPrefixLabel.Text = "STATUS:";
+        statusValueLabel.AutoSize = true;
+        statusValueLabel.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+        statusValueLabel.Location = new Point(72, 7);
+        statusValueLabel.Text = "IDLE";
+        statusChip.Controls.Add(statusPrefixLabel);
+        statusChip.Controls.Add(statusValueLabel);
 
-        // hideVrPlanesCheckBox
-        this.hideVrPlanesCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.hideVrPlanesCheckBox.AutoSize = true;
-        this.hideVrPlanesCheckBox.Location = new System.Drawing.Point(526, 96);
-        this.hideVrPlanesCheckBox.Text = "Hide VR Planes";
-        this.hideVrPlanesCheckBox.Checked = true;
-        this.hideVrPlanesCheckBox.CheckState = CheckState.Checked;
-        this.hideVrPlanesCheckBox.CheckedChanged += this.filterCheckBox_CheckedChanged;
+        headerPanel.Controls.Add(titleLabel);
+        headerPanel.Controls.Add(subtitleLabel);
+        headerPanel.Controls.Add(activeModsChip);
+        headerPanel.Controls.Add(statusChip);
 
-        // darkModeCheckBox
-        this.darkModeCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.darkModeCheckBox.AutoSize = true;
-        this.darkModeCheckBox.Location = new System.Drawing.Point(430, 78);
-        this.darkModeCheckBox.Text = "Dark mode";
-        this.darkModeCheckBox.CheckedChanged += this.darkModeCheckBox_CheckedChanged;
+        // paths — absolute layout driven by LayoutContentColumns
+        pathsPanel.Dock = DockStyle.Fill;
+        pathsPanel.Margin = new Padding(0);
+        modsPathLabel.AutoSize = true;
+        modsPathLabel.Font = new Font("Segoe UI", 8F, FontStyle.Bold);
+        modsPathLabel.Text = "~mods Directory";
+        scanModsFolderButton.FlatStyle = FlatStyle.Flat;
+        scanModsFolderButton.Text = "Choose ~mods";
+        scanModsFolderButton.UseMnemonic = false;
+        scanModsFolderButton.Click += scanModsFolderButton_Click;
 
-        // searchTextBox (width updated on resize so Export/Import stay to the right)
-        this.searchTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        this.searchTextBox.BorderStyle = BorderStyle.FixedSingle;
-        this.searchTextBox.Location = new System.Drawing.Point(12, 118);
-        this.searchTextBox.Size = new System.Drawing.Size(508, 24);
-        this.searchTextBox.PlaceholderText = "Search PlaneStringID, PlaneID, or Name";
-        this.searchTextBox.TextChanged += this.searchTextBox_TextChanged;
+        unrealPakLabel.AutoSize = true;
+        unrealPakLabel.Font = new Font("Segoe UI", 8F, FontStyle.Bold);
+        unrealPakLabel.Text = "UnrealPak.exe Directory";
+        browseUnrealPakButton.FlatStyle = FlatStyle.Flat;
+        browseUnrealPakButton.Text = "Browse EXE";
+        browseUnrealPakButton.Click += browseUnrealPakButton_Click;
 
-        // planesGrid
-        this.planesGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-        this.planesGrid.BorderStyle = BorderStyle.FixedSingle;
-        this.planesGrid.Location = new System.Drawing.Point(12, 148);
-        this.planesGrid.Size = new System.Drawing.Size(606, 225);
-        this.planesGrid.RowTemplate.Height = 24;
-        this.planesGrid.AllowUserToAddRows = false;
-        this.planesGrid.AllowUserToDeleteRows = false;
-        this.planesGrid.AllowUserToResizeRows = false;
-        this.planesGrid.RowHeadersVisible = false;
-        this.planesGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        this.planesGrid.MultiSelect = true;
-        this.planesGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-        this.planesGrid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-        this.planesGrid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+        pathsPanel.Controls.Add(modsPathLabel);
+        pathsPanel.Controls.Add(pakPathTextBox);
+        pathsPanel.Controls.Add(scanModsFolderButton);
+        pathsPanel.Controls.Add(unrealPakLabel);
+        pathsPanel.Controls.Add(unrealPakPathTextBox);
+        pathsPanel.Controls.Add(browseUnrealPakButton);
 
-        var enabledColumn = new DataGridViewCheckBoxColumn
+        // actions — 3-column table: left | stretch empty | right (no Dock seam)
+        actionsPanel.Dock = DockStyle.Fill;
+        actionsPanel.Margin = new Padding(0);
+        actionsLayout.Dock = DockStyle.Fill;
+        actionsLayout.ColumnCount = 3;
+        actionsLayout.RowCount = 1;
+        actionsLayout.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
+        actionsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        actionsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        actionsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        actionsLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        actionsLayout.Padding = new Padding(ContentPad, 6, ContentPad, 6);
+
+        actionsLeft.AutoSize = true;
+        actionsLeft.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        actionsLeft.Dock = DockStyle.Fill;
+        actionsLeft.FlowDirection = FlowDirection.LeftToRight;
+        actionsLeft.WrapContents = false;
+        actionsLeft.Padding = new Padding(0);
+        actionsLeft.Margin = new Padding(0);
+        actionsLeft.BorderStyle = BorderStyle.None;
+
+        actionsRight.AutoSize = true;
+        actionsRight.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        actionsRight.Dock = DockStyle.Fill;
+        actionsRight.FlowDirection = FlowDirection.LeftToRight;
+        actionsRight.WrapContents = false;
+        actionsRight.Padding = new Padding(0);
+        actionsRight.Margin = new Padding(0);
+        actionsRight.BorderStyle = BorderStyle.None;
+
+        unpackAndLoadButton.FlatStyle = FlatStyle.Flat;
+        unpackAndLoadButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+        unpackAndLoadButton.Margin = new Padding(0, 0, Gap, 0);
+        unpackAndLoadButton.Text = "Unpack && Load";
+        unpackAndLoadButton.Click += unpackAndLoadButton_Click;
+
+        applyAndSaveButton.FlatStyle = FlatStyle.Flat;
+        applyAndSaveButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+        applyAndSaveButton.Margin = new Padding(0, 0, Gap, 0);
+        applyAndSaveButton.Text = "Apply, Save && Pack";
+        applyAndSaveButton.Click += applyAndSaveButton_Click;
+
+        openOutputFolderButton.FlatStyle = FlatStyle.Flat;
+        openOutputFolderButton.Margin = new Padding(0);
+        openOutputFolderButton.Text = "Open Unpacked Folder";
+        openOutputFolderButton.Click += openOutputFolderButton_Click;
+
+        hideBaseGameCheckBox.AutoSize = true;
+        hideBaseGameCheckBox.Margin = new Padding(0, 0, 16, 0);
+        hideBaseGameCheckBox.TextAlign = ContentAlignment.MiddleLeft;
+        hideBaseGameCheckBox.Text = "Hide Base Game";
+        hideBaseGameCheckBox.Checked = true;
+        hideBaseGameCheckBox.CheckedChanged += filterCheckBox_CheckedChanged;
+
+        hideVrPlanesCheckBox.AutoSize = true;
+        hideVrPlanesCheckBox.Margin = new Padding(0, 0, 16, 0);
+        hideVrPlanesCheckBox.TextAlign = ContentAlignment.MiddleLeft;
+        hideVrPlanesCheckBox.Text = "Hide VR Planes";
+        hideVrPlanesCheckBox.Checked = true;
+        hideVrPlanesCheckBox.CheckedChanged += filterCheckBox_CheckedChanged;
+
+        darkModeCheckBox.AutoSize = true;
+        darkModeCheckBox.Margin = new Padding(0);
+        darkModeCheckBox.TextAlign = ContentAlignment.MiddleLeft;
+        darkModeCheckBox.Text = "Dark Mode";
+        darkModeCheckBox.CheckedChanged += darkModeCheckBox_CheckedChanged;
+
+        actionsLeft.Controls.Add(unpackAndLoadButton);
+        actionsLeft.Controls.Add(applyAndSaveButton);
+        actionsLeft.Controls.Add(openOutputFolderButton);
+        actionsRight.Controls.Add(hideBaseGameCheckBox);
+        actionsRight.Controls.Add(hideVrPlanesCheckBox);
+        actionsRight.Controls.Add(darkModeCheckBox);
+        actionsLayout.Controls.Add(actionsLeft, 0, 0);
+        actionsLayout.Controls.Add(new Panel { Dock = DockStyle.Fill, Margin = new Padding(0) }, 1, 0);
+        actionsLayout.Controls.Add(actionsRight, 2, 0);
+        actionsPanel.Controls.Add(actionsLayout);
+
+        // search — same left/right inset as path fields
+        searchPanel.Dock = DockStyle.Fill;
+        searchPanel.Margin = new Padding(0);
+        searchTextBox.BorderStyle = BorderStyle.FixedSingle;
+        searchTextBox.PlaceholderText = "Filter plane list...";
+        searchTextBox.TextChanged += searchTextBox_TextChanged;
+        searchPanel.Controls.Add(searchTextBox);
+
+        // grid
+        planesGrid.Dock = DockStyle.Fill;
+        planesGrid.Margin = new Padding(0);
+        planesGrid.BorderStyle = BorderStyle.FixedSingle;
+        planesGrid.BackgroundColor = Color.FromArgb(18, 22, 30);
+        planesGrid.RowTemplate.Height = 28;
+        planesGrid.AllowUserToAddRows = false;
+        planesGrid.AllowUserToDeleteRows = false;
+        planesGrid.AllowUserToResizeRows = false;
+        planesGrid.RowHeadersVisible = false;
+        planesGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        planesGrid.MultiSelect = true;
+        planesGrid.EditMode = DataGridViewEditMode.EditOnEnter;
+        planesGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+        planesGrid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+        planesGrid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+        planesGrid.ColumnHeadersHeight = 36;
+        planesGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+        planesGrid.Columns.Add(new DataGridViewCheckBoxColumn
         {
             Name = "Enabled",
-            HeaderText = "",
+            HeaderText = "Active",
             DataPropertyName = "Enabled",
             AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
             MinimumWidth = 30,
             Resizable = DataGridViewTriState.False
-        };
-        var planeIdColumn = new DataGridViewTextBoxColumn
+        });
+        planesGrid.Columns.Add(new DataGridViewTextBoxColumn
         {
             Name = "PlaneID",
-            HeaderText = "PlaneID",
+            HeaderText = "Plane ID",
             DataPropertyName = "PlaneID",
             AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
             MinimumWidth = 60,
             ReadOnly = true
-        };
-        var idColumn = new DataGridViewTextBoxColumn
+        });
+        planesGrid.Columns.Add(new DataGridViewTextBoxColumn
         {
             Name = "PlaneStringID",
-            HeaderText = "PlaneStringID",
+            HeaderText = "String ID",
             DataPropertyName = "PlaneStringID",
             AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
             MinimumWidth = 80,
             ReadOnly = true
-        };
-        var nameColumn = new DataGridViewTextBoxColumn
+        });
+        planesGrid.Columns.Add(new DataGridViewTextBoxColumn
         {
             Name = "Name",
-            HeaderText = "Name",
+            HeaderText = "Plane Name",
             DataPropertyName = "PlaneName",
             AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
             MinimumWidth = 80,
             ReadOnly = true
-        };
-        var modColumn = new DataGridViewTextBoxColumn
+        });
+        planesGrid.Columns.Add(new DataGridViewTextBoxColumn
         {
             Name = "Mod",
-            HeaderText = "Mod",
+            HeaderText = "Mod Origin",
             DataPropertyName = "ModText",
             AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
             MinimumWidth = 120,
             ReadOnly = true
-        };
-        this.planesGrid.Columns.Add(enabledColumn);
-        this.planesGrid.Columns.Add(planeIdColumn);
-        this.planesGrid.Columns.Add(idColumn);
-        this.planesGrid.Columns.Add(nameColumn);
-        this.planesGrid.Columns.Add(modColumn);
-        this.planesGrid.CurrentCellDirtyStateChanged += this.planesGrid_CurrentCellDirtyStateChanged;
-        this.planesGrid.CellValueChanged += this.planesGrid_CellValueChanged;
-        this.planesGrid.CellMouseDown += this.planesGrid_CellMouseDown;
-        this.planesGrid.CellContentClick += this.planesGrid_CellContentClick;
-        this.planesGrid.CellFormatting += this.planesGrid_CellFormatting;
+        });
+        planesGrid.CurrentCellDirtyStateChanged += planesGrid_CurrentCellDirtyStateChanged;
+        planesGrid.CellValueChanged += planesGrid_CellValueChanged;
+        planesGrid.CellMouseDown += planesGrid_CellMouseDown;
+        planesGrid.CellContentClick += planesGrid_CellContentClick;
+        planesGrid.CellFormatting += planesGrid_CellFormatting;
 
-        // logTextBox
-        this.logTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-        this.logTextBox.BorderStyle = BorderStyle.FixedSingle;
-        this.logTextBox.Location = new System.Drawing.Point(12, 379);
-        this.logTextBox.Size = new System.Drawing.Size(606, 80);
-        this.logTextBox.Multiline = true;
-        this.logTextBox.ScrollBars = ScrollBars.Vertical;
-        this.logTextBox.ReadOnly = true;
+        // log
+        logPanel.Dock = DockStyle.Fill;
+        logPanel.Margin = new Padding(0);
+        logTitleLabel.AutoSize = true;
+        logTitleLabel.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+        logTitleLabel.Text = "DIAGNOSTIC SYSTEM OUTPUT LOG";
+        logTextBox.BorderStyle = BorderStyle.FixedSingle;
+        logTextBox.Multiline = true;
+        logTextBox.ScrollBars = ScrollBars.Vertical;
+        logTextBox.ReadOnly = true;
+        logTextBox.Font = new Font("Consolas", 9F);
+        logPanel.Controls.Add(logTitleLabel);
+        logPanel.Controls.Add(logTextBox);
 
-        // MainForm
-        this.Font = new Font("Segoe UI", 9F);
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-        this.AutoScaleMode = AutoScaleMode.Font;
-        this.ClientSize = new System.Drawing.Size(630, 471);
-        this.Controls.Add(this.pakPathTextBox);
-        this.Controls.Add(this.scanModsFolderButton);
-        this.Controls.Add(this.unrealPakPathTextBox);
-        this.Controls.Add(this.browseUnrealPakButton);
-        this.Controls.Add(this.unpackAndLoadButton);
-        this.Controls.Add(this.applyAndSaveButton);
-        this.Controls.Add(this.openOutputFolderButton);
-        this.Controls.Add(this.hideBaseGameCheckBox);
-        this.Controls.Add(this.hideVrPlanesCheckBox);
-        this.Controls.Add(this.darkModeCheckBox);
-        this.Controls.Add(this.searchTextBox);
-        this.Controls.Add(this.planesGrid);
-        this.Controls.Add(this.logTextBox);
-        this.MinimumSize = new System.Drawing.Size(650, 510);
-        this.Text = "Ace Combat 7 Disable-Enabler";
-        this.FormClosing += this.MainForm_FormClosing;
+        rootLayout.Controls.Add(headerPanel, 0, 0);
+        rootLayout.Controls.Add(pathsPanel, 0, 1);
+        rootLayout.Controls.Add(actionsPanel, 0, 2);
+        rootLayout.Controls.Add(searchPanel, 0, 3);
+        rootLayout.Controls.Add(planesGrid, 0, 4);
+        rootLayout.Controls.Add(logPanel, 0, 5);
 
-        ((System.ComponentModel.ISupportInitialize)(this.planesGrid)).EndInit();
-        this.ResumeLayout(false);
-        this.PerformLayout();
+        Font = new Font("Segoe UI", 9F);
+        AutoScaleDimensions = new SizeF(7F, 15F);
+        AutoScaleMode = AutoScaleMode.Font;
+        ClientSize = new Size(1280, 860);
+        Controls.Add(rootLayout);
+        MinimumSize = new Size(1100, 720);
+        Text = "THE DISABLE-ENABLER";
+        FormClosing += MainForm_FormClosing;
+        Resize += (_, _) => LayoutContentColumns();
+
+        ((System.ComponentModel.ISupportInitialize)planesGrid).EndInit();
+        logPanel.ResumeLayout(false);
+        logPanel.PerformLayout();
+        searchPanel.ResumeLayout(false);
+        actionsRight.ResumeLayout(false);
+        actionsRight.PerformLayout();
+        actionsLeft.ResumeLayout(false);
+        actionsLayout.ResumeLayout(false);
+        actionsLayout.PerformLayout();
+        actionsPanel.ResumeLayout(false);
+        pathsPanel.ResumeLayout(false);
+        pathsPanel.PerformLayout();
+        headerPanel.ResumeLayout(false);
+        headerPanel.PerformLayout();
+        rootLayout.ResumeLayout(false);
+        ResumeLayout(false);
+    }
+
+    /// <summary>
+    /// Single content column: same left/right edges for paths, search, log, and header chips.
+    /// </summary>
+    private void LayoutContentColumns()
+    {
+        LayoutHeaderChips();
+        LayoutPaths();
+        LayoutSearch();
+        LayoutLog();
+    }
+
+    private void LayoutHeaderChips()
+    {
+        var right = headerPanel.ClientSize.Width - ContentPad;
+        statusChip.Top = 14;
+        activeModsChip.Top = 14;
+        statusChip.Left = right - statusChip.Width;
+        activeModsChip.Left = statusChip.Left - Gap - activeModsChip.Width;
+    }
+
+    private void LayoutPaths()
+    {
+        var left = ContentPad;
+        var right = pathsPanel.ClientSize.Width - ContentPad;
+        // Shared row height; CenteredPathTextBox vertically centers text inside via EM_SETRECT.
+        var boxH = MeasureSingleLineBoxHeight(Font);
+        var fieldRight = right - PathButtonWidth - Gap;
+        var fieldW = Math.Max(120, fieldRight - left);
+
+        modsPathLabel.Location = new Point(left, 8);
+        var row1Y = modsPathLabel.Bottom + BoxPadY;
+        pakPathTextBox.SetBounds(left, row1Y, fieldW, boxH);
+        scanModsFolderButton.SetBounds(fieldRight + Gap, row1Y, PathButtonWidth, boxH);
+
+        unrealPakLabel.Location = new Point(left, pakPathTextBox.Bottom + Gap + 4);
+        var row2Y = unrealPakLabel.Bottom + BoxPadY;
+        unrealPakPathTextBox.SetBounds(left, row2Y, fieldW, boxH);
+        browseUnrealPakButton.SetBounds(fieldRight + Gap, row2Y, PathButtonWidth, boxH);
+    }
+
+    private void LayoutSearch()
+    {
+        var left = ContentPad;
+        var w = Math.Max(120, searchPanel.ClientSize.Width - ContentPad * 2);
+        var boxH = MeasureSingleLineBoxHeight(Font);
+        var y = Math.Max(BoxPadY, (searchPanel.ClientSize.Height - boxH) / 2);
+        searchTextBox.SetBounds(left, y, w, boxH);
+    }
+
+    private void LayoutLog()
+    {
+        var left = ContentPad;
+        var w = Math.Max(120, logPanel.ClientSize.Width - ContentPad * 2);
+        logTitleLabel.Location = new Point(left, BoxPadY);
+        var logTop = logTitleLabel.Bottom + BoxPadY;
+        logTextBox.SetBounds(left, logTop, w, Math.Max(40, logPanel.ClientSize.Height - logTop - BoxPadY));
+    }
+
+    private static int MeasureSingleLineBoxHeight(Font font)
+    {
+        var textH = TextRenderer.MeasureText("Ag", font, Size.Empty,
+            TextFormatFlags.SingleLine | TextFormatFlags.NoPadding).Height;
+        // Room for glyphs + equal visual pad; Flat buttons need a little extra vs TextBox.
+        return Math.Max(28, textH + BoxPadY * 2 + 4);
     }
 }
-
