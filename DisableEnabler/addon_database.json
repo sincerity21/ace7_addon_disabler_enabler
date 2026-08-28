@@ -1,5 +1,5 @@
 {
-    "revision": 4,
+    "revision": 5,
     "planes": {
         "f04e": {
             "PlaneName": "F-4E Phantom II",
@@ -282,6 +282,54 @@
             "Notes": "MiG-35D Super Fulcrum Set / Cutting-edge Aircraft Series DLC",
             "Notes2": "",
             "URL": "https://store.steampowered.com/app/1692460/ACE_COMBAT7_SKIES_UNKNOWN_25th_Anniversary_DLC__CuttingEdge_Aircraft_Series_Set/"
+        },
+        "f18f_vr": {
+            "PlaneName": "F/A-18F",
+            "Notes": "PRE-CAMPAIGN MOD (WIP)",
+            "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
+            "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
+        },
+        "a10a_vr": {
+            "PlaneName": "A-10C",
+            "Notes": "PRE-CAMPAIGN MOD (WIP)",
+            "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
+            "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
+        },
+        "f22a_vr": {
+            "PlaneName": "F-22A",
+            "Notes": "PRE-CAMPAIGN MOD (WIP)",
+            "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
+            "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
+        },
+        "su30_vr": {
+            "PlaneName": "Su-30M2",
+            "Notes": "PRE-CAMPAIGN MOD (WIP)",
+            "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
+            "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
+        },
+        "f15c_vr": {
+            "PlaneName": "F-15C",
+            "Notes": "PRE-CAMPAIGN MOD (WIP)",
+            "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
+            "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
+        },
+        "f16c_vr": {
+            "PlaneName": "F-16C",
+            "Notes": "PRE-CAMPAIGN MOD (WIP)",
+            "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
+            "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
+        },
+        "f35c_vr": {
+            "PlaneName": "F-35C",
+            "Notes": "PRE-CAMPAIGN MOD (WIP)",
+            "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
+            "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
+        },
+        "f04e_vr": {
+            "PlaneName": "F-4E",
+            "Notes": "PRE-CAMPAIGN MOD (WIP)",
+            "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
+            "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
         },
         "zx01": {
             "PlaneName": "ADFX-00(AC2)",
