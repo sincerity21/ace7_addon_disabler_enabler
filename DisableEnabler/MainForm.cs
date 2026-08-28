@@ -449,28 +449,40 @@ public partial class MainForm : Form
         var active = _allPlanes.Count(p => p.Enabled);
         activeModsLabel.Text = $"{active} / {total} ACTIVE";
 
-        // Grow chip to fit text with padding
-        var need = TextRenderer.MeasureText(activeModsLabel.Text, activeModsLabel.Font).Width + 48;
-        activeModsChip.Width = Math.Max(150, need);
-        LayoutHeaderChips();
+        // Grow active chip to fit text with padding
+        var activeNeed = TextRenderer.MeasureText(activeModsLabel.Text, activeModsLabel.Font).Width + 48;
+        activeModsChip.Width = Math.Max(150, activeNeed);
 
         if (_pakScanInProgress)
         {
             statusValueLabel.Text = "SCANNING";
             statusValueLabel.ForeColor = UiTheme.Orange;
-            return;
-        }
-
-        if (total == 0)
-        {
-            statusValueLabel.Text = "IDLE";
-            statusValueLabel.ForeColor = UiTheme.TextMuted(_isDarkMode);
         }
         else
         {
-            statusValueLabel.Text = "TARGET READY";
-            statusValueLabel.ForeColor = UiTheme.Orange;
+            switch (_workflowStep)
+            {
+                case WorkflowStep.ReadyToUnpack:
+                    statusValueLabel.Text = "UNPACK READY";
+                    statusValueLabel.ForeColor = UiTheme.Orange;
+                    break;
+                case WorkflowStep.ReadyToPack:
+                    statusValueLabel.Text = "SAVE, PACK READY";
+                    statusValueLabel.ForeColor = UiTheme.Orange;
+                    break;
+                case WorkflowStep.NoPak:
+                default:
+                    statusValueLabel.Text = "IDLE";
+                    statusValueLabel.ForeColor = UiTheme.TextMuted(_isDarkMode);
+                    break;
+            }
         }
+
+        // Grow status chip to fit text with padding
+        var statusNeed = statusValueLabel.Left + TextRenderer.MeasureText(statusValueLabel.Text, statusValueLabel.Font).Width + 16;
+        statusChip.Width = Math.Max(160, statusNeed);
+
+        LayoutHeaderChips();
     }
 
     private void filterCheckBox_CheckedChanged(object? sender, EventArgs e)
@@ -912,8 +924,8 @@ public partial class MainForm : Form
 
             EnrichPlanesFromAddonDatabase();
             ApplyPlaneFilters();
-            UpdateStatusChips();
             _workflowStep = WorkflowStep.ReadyToPack;
+            UpdateStatusChips();
             UpdateActionButtons();
 
             Log($"Loaded {rows.Count} planes from {jsonPath}");
