@@ -326,7 +326,7 @@ public partial class MainForm
         planesGrid.Columns.Add(new DataGridViewTextBoxColumn
         {
             Name = "Mod",
-            HeaderText = "Mod Origin",
+            HeaderText = "Origin",
             DataPropertyName = "ModText",
             AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
             MinimumWidth = 120,
