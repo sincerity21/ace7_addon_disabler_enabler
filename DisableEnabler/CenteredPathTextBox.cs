@@ -5,7 +5,7 @@ using System.Windows.Forms;
 namespace DisableEnabler;
 
 /// <summary>
-/// Bordered read-only path field with a single-line inner textbox vertically centered in the outer box.
+/// Bordered single-line field with an inner textbox vertically centered in the outer box.
 /// </summary>
 internal sealed class CenteredPathTextBox : Panel
 {
@@ -13,18 +13,30 @@ internal sealed class CenteredPathTextBox : Panel
 
     private readonly TextBox _inner;
 
-    public CenteredPathTextBox()
+    public CenteredPathTextBox(bool readOnly = true)
     {
         BorderStyle = BorderStyle.FixedSingle;
         _inner = new TextBox
         {
-            ReadOnly = true,
+            ReadOnly = readOnly,
             BorderStyle = BorderStyle.None,
-            TabStop = false,
+            TabStop = !readOnly,
             Multiline = false,
             Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right
         };
         Controls.Add(_inner);
+    }
+
+    public string PlaceholderText
+    {
+        get => _inner.PlaceholderText;
+        set => _inner.PlaceholderText = value;
+    }
+
+    public new event EventHandler? TextChanged
+    {
+        add => _inner.TextChanged += value;
+        remove => _inner.TextChanged -= value;
     }
 
     public override string? Text

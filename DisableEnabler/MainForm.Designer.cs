@@ -11,6 +11,7 @@ public partial class MainForm
     private const int Gap = 8;
     private const int BoxPadY = 4;
     private const int BoxPadX = 10;
+    private const int SectionGap = 10;
 
     private TableLayoutPanel rootLayout = null!;
     private Panel headerPanel = null!;
@@ -43,7 +44,7 @@ public partial class MainForm
     private CheckBox darkModeCheckBox = null!;
 
     private Panel searchPanel = null!;
-    private TextBox searchTextBox = null!;
+    private CenteredPathTextBox searchTextBox = null!;
 
     private DataGridView planesGrid = null!;
 
@@ -84,7 +85,7 @@ public partial class MainForm
         darkModeCheckBox = new CheckBox();
 
         searchPanel = new Panel();
-        searchTextBox = new TextBox();
+        searchTextBox = new CenteredPathTextBox(readOnly: false);
 
         planesGrid = new DataGridView();
         logPanel = new Panel();
@@ -193,7 +194,7 @@ public partial class MainForm
         actionsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
         actionsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         actionsLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-        actionsLayout.Padding = new Padding(ContentPad, 6, ContentPad, 6);
+        actionsLayout.Padding = new Padding(ContentPad, 0, ContentPad, 0);
 
         actionsLeft.AutoSize = true;
         actionsLeft.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -264,7 +265,6 @@ public partial class MainForm
         // search — same left/right inset as path fields
         searchPanel.Dock = DockStyle.Fill;
         searchPanel.Margin = new Padding(0);
-        searchTextBox.BorderStyle = BorderStyle.FixedSingle;
         searchTextBox.PlaceholderText = "Filter plane list...";
         searchTextBox.TextChanged += searchTextBox_TextChanged;
         searchPanel.Controls.Add(searchTextBox);
@@ -394,6 +394,7 @@ public partial class MainForm
     {
         LayoutHeaderChips();
         LayoutPaths();
+        LayoutMiddleSection();
         LayoutSearch();
         LayoutLog();
     }
@@ -421,10 +422,30 @@ public partial class MainForm
         pakPathTextBox.SetBounds(left, row1Y, fieldW, boxH);
         scanModsFolderButton.SetBounds(fieldRight + Gap, row1Y, PathButtonWidth, boxH);
 
-        unrealPakLabel.Location = new Point(left, pakPathTextBox.Bottom + Gap + 4);
+        unrealPakLabel.Location = new Point(left, pakPathTextBox.Bottom + SectionGap);
         var row2Y = unrealPakLabel.Bottom + BoxPadY;
         unrealPakPathTextBox.SetBounds(left, row2Y, fieldW, boxH);
         browseUnrealPakButton.SetBounds(fieldRight + Gap, row2Y, PathButtonWidth, boxH);
+    }
+
+    private void LayoutMiddleSection()
+    {
+        var boxH = MeasureSingleLineBoxHeight(Font);
+        var btnH = Math.Max(
+            Math.Max(unpackAndLoadButton.Height, applyAndSaveButton.Height),
+            openOutputFolderButton.Height);
+        if (btnH <= 0)
+            btnH = boxH;
+
+        var pathsBottom = Math.Max(browseUnrealPakButton.Bottom, unrealPakPathTextBox.Bottom);
+        if (pathsBottom <= 0)
+            pathsBottom = 120;
+
+        rootLayout.RowStyles[1].Height = pathsBottom + SectionGap;
+        rootLayout.RowStyles[2].Height = btnH;
+        rootLayout.RowStyles[3].Height = SectionGap + boxH;
+
+        planesGrid.Margin = new Padding(0, SectionGap, 0, 0);
     }
 
     private void LayoutSearch()
@@ -432,8 +453,7 @@ public partial class MainForm
         var left = ContentPad;
         var w = Math.Max(120, searchPanel.ClientSize.Width - ContentPad * 2);
         var boxH = MeasureSingleLineBoxHeight(Font);
-        var y = Math.Max(BoxPadY, (searchPanel.ClientSize.Height - boxH) / 2);
-        searchTextBox.SetBounds(left, y, w, boxH);
+        searchTextBox.SetBounds(left, SectionGap, w, boxH);
     }
 
     private void LayoutLog()

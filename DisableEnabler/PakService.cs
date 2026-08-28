@@ -9,6 +9,9 @@ namespace DisableEnabler;
 
 public static class PakService
 {
+    private const string PlaneTableMarker = "PlayerPlaneDataTable.uasset";
+    private const string StateJsonMarker = "DisableEnabler_plane_states.json";
+
     public static bool PakContainsFile(string unrealPakExe, string pakPath, string fileNameSubstring, Action<string> log)
     {
         var args = $"\"{pakPath}\" -list";
@@ -55,7 +58,25 @@ public static class PakService
         return false;
     }
 
-    public static string? FindWinningPlanePakInFolder(string unrealPakExe, string modsFolder, Action<string> log)
+    public static bool IsDisableEnablerPakByFileName(string pakPath)
+    {
+        var name = Path.GetFileNameWithoutExtension(pakPath);
+        if (string.IsNullOrEmpty(name) || !name.EndsWith("_P", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var baseName = name[..^2].TrimStart('~');
+        return baseName.EndsWith("_DisableEnabler", StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static bool IsDisableEnablerPak(string pakPath, string unrealPakExe, Action<string> log)
+    {
+        if (IsDisableEnablerPakByFileName(pakPath))
+            return true;
+
+        return PakContainsFile(unrealPakExe, pakPath, StateJsonMarker, log);
+    }
+
+    public static PakScanSelection FindWinningPlanePakInFolder(string unrealPakExe, string modsFolder, Action<string> log)
     {
         if (string.IsNullOrWhiteSpace(modsFolder) || !Directory.Exists(modsFolder))
         {
@@ -71,33 +92,101 @@ public static class PakService
         if (pakFiles.Count == 0)
         {
             log($"No .pak files found in folder: {modsFolder}");
-            return null;
+            return new PakScanSelection();
         }
 
         log($"Found {pakFiles.Count} .pak file(s) in folder: {modsFolder}");
 
-        var candidates = new List<string>();
-        // Match by file name so we don't depend on the exact internal path printed by UnrealPak -list.
-        const string planeTableMarker = "PlayerPlaneDataTable.uasset";
+        var sourceCandidates = new List<string>();
+        var deCandidates = new List<string>();
 
         foreach (var pak in pakFiles)
         {
-            if (PakContainsFile(unrealPakExe, pak, planeTableMarker, log))
+            if (!PakContainsFile(unrealPakExe, pak, PlaneTableMarker, log))
+                continue;
+
+            if (IsDisableEnablerPak(pak, unrealPakExe, log))
             {
-                candidates.Add(pak);
-                log($"Plane table found in PAK (candidate): {pak}");
+                deCandidates.Add(pak);
+                log($"Skipped DisableEnabler output PAK (blacklisted): {pak}");
+                continue;
+            }
+
+            sourceCandidates.Add(pak);
+            log($"Plane table found in PAK (source candidate): {pak}");
+        }
+
+        if (sourceCandidates.Count == 0)
+        {
+            if (deCandidates.Count > 0)
+            {
+                log("No non-DisableEnabler PPDT source PAK was found. Only DisableEnabler output PAK(s) contain PlayerPlaneDataTable.uasset.");
+            }
+            else
+            {
+                log("No PAKs with PlayerPlaneDataTable.uasset were found in this folder.");
+            }
+
+            return new PakScanSelection { BlacklistedDePaks = deCandidates };
+        }
+
+        var winningPak = sourceCandidates[^1];
+        log($"Selected winning plane PAK (last in load order): {winningPak}");
+        return new PakScanSelection
+        {
+            SourcePak = winningPak,
+            BlacklistedDePaks = deCandidates
+        };
+    }
+
+    public static bool TryExtractFileFromPak(
+        string unrealPakExe,
+        string pakPath,
+        string fileNameSubstring,
+        string destFilePath,
+        Action<string> log)
+    {
+        if (!PakContainsFile(unrealPakExe, pakPath, fileNameSubstring, log))
+        {
+            log($"File matching '{fileNameSubstring}' was not found in PAK: {pakPath}");
+            return false;
+        }
+
+        var tempDir = Path.Combine(Path.GetTempPath(), $"DisableEnabler_migrate_{Guid.NewGuid():N}");
+        try
+        {
+            ExtractPak(unrealPakExe, pakPath, tempDir, log);
+
+            var matches = Directory.GetFiles(tempDir, $"*{Path.GetFileName(fileNameSubstring)}", SearchOption.AllDirectories);
+            if (matches.Length == 0)
+            {
+                log($"Extracted PAK but could not find '{fileNameSubstring}' on disk under {tempDir}");
+                return false;
+            }
+
+            var sourceFile = matches[0];
+            Directory.CreateDirectory(Path.GetDirectoryName(destFilePath) ?? ".");
+            File.Copy(sourceFile, destFilePath, overwrite: true);
+            log($"Extracted {fileNameSubstring} from {pakPath} to {destFilePath}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            log($"Failed to extract '{fileNameSubstring}' from {pakPath}: {ex.Message}");
+            return false;
+        }
+        finally
+        {
+            try
+            {
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, recursive: true);
+            }
+            catch (Exception ex)
+            {
+                log($"Could not delete temp migration folder {tempDir}: {ex.Message}");
             }
         }
-
-        if (candidates.Count == 0)
-        {
-            log("No PAKs with PlayerPlaneDataTable.uasset were found in this folder.");
-            return null;
-        }
-
-        var winningPak = candidates[^1];
-        log($"Selected winning plane PAK (last in load order): {winningPak}");
-        return winningPak;
     }
 
     public static void ExtractPak(string unrealPakExe, string pakPath, string extractDir, Action<string> log)
@@ -220,4 +309,3 @@ public static class PakService
         }
     }
 }
-

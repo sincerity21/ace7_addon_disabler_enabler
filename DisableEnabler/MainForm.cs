@@ -179,7 +179,7 @@ public partial class MainForm : Form
 
         StylePathField(pakPathTextBox, dark);
         StylePathField(unrealPakPathTextBox, dark);
-        StyleTextBox(searchTextBox, dark);
+        StylePathField(searchTextBox, dark);
         StyleTextBox(logTextBox, dark, isLog: true);
 
         StyleSecondaryButton(scanModsFolderButton, dark);
@@ -639,14 +639,27 @@ public partial class MainForm : Form
 
         try
         {
-            var winningPak = PakService.FindWinningPlanePakInFolder(unrealPakPath, chosenFolder, LogLine);
-            if (string.IsNullOrWhiteSpace(winningPak))
+            var selection = PakService.FindWinningPlanePakInFolder(unrealPakPath, chosenFolder, LogLine);
+
+            if (!PlaneStateStore.Exists() && selection.BlacklistedDePaks.Count > 0)
+            {
+                var dePak = selection.BlacklistedDePaks[^1];
+                LogLine($"No plane state sidecar found; migrating state from {dePak}");
+                PakService.TryExtractFileFromPak(
+                    unrealPakPath,
+                    dePak,
+                    "DisableEnabler_plane_states.json",
+                    PlaneStateStore.SidecarPath,
+                    LogLine);
+            }
+
+            if (string.IsNullOrWhiteSpace(selection.SourcePak))
             {
                 result.NoMatch = true;
                 return result;
             }
 
-            result.WinningPak = winningPak;
+            result.WinningPak = selection.SourcePak;
         }
         catch (Exception ex)
         {
@@ -808,14 +821,14 @@ public partial class MainForm : Form
             if (showDialogs)
             {
                 MessageBox.Show(this,
-                    "No PAKs with PlayerPlaneDataTable.uasset were found in the selected folder.",
+                    "No source PPDT PAK was found in the selected folder. If only DisableEnabler output PAK(s) are present, install or update the upstream PPDT mod first.",
                     "No matching PAK",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
             }
             else
             {
-                Log("No PAKs with PlayerPlaneDataTable.uasset were found in the saved ~mods folder.");
+                Log("No source PPDT PAK was found in the saved ~mods folder.");
             }
 
             return false;
@@ -882,36 +895,7 @@ public partial class MainForm : Form
                 _allPlanes.Add(row);
             }
 
-            // If the packed state list exists (from a previous Apply, Save and Pack), apply it so state is restored
-            var stateJsonPath = Path.Combine(Path.GetDirectoryName(assetPath) ?? unpackDir, "DisableEnabler_plane_states.json");
-            if (File.Exists(stateJsonPath))
-            {
-                try
-                {
-                    var stateJson = File.ReadAllText(stateJsonPath);
-                    var entries = JsonConvert.DeserializeObject<List<PlaneStateExportEntry>>(stateJson);
-                    if (entries != null && entries.Count > 0)
-                    {
-                        var byId = entries.ToDictionary(e => e.PlaneStringID, e => e, StringComparer.OrdinalIgnoreCase);
-                        var updated = 0;
-                        foreach (var plane in _allPlanes)
-                        {
-                            if (byId.TryGetValue(plane.PlaneStringID, out var entry))
-                            {
-                                plane.Enabled = entry.Enabled;
-                                if (!string.IsNullOrEmpty(entry.OriginalDLCID))
-                                    plane.DLCID = entry.OriginalDLCID;
-                                updated++;
-                            }
-                        }
-                        Log($"Applied packed state from DisableEnabler_plane_states.json ({updated} planes).");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log($"Could not apply packed state: {ex.Message}");
-                }
-            }
+            PlaneStateStore.ApplyToPlanes(_allPlanes, Log);
 
             EnrichPlanesFromAddonDatabase();
             ApplyPlaneFilters();
@@ -958,22 +942,7 @@ public partial class MainForm : Form
             var jsonPath = Path.Combine(assetDir, "PlayerPlaneDataTable.json");
 
             var stateJsonPath = Path.Combine(assetDir, "DisableEnabler_plane_states.json");
-            var originalDlcIds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            if (File.Exists(stateJsonPath))
-            {
-                try
-                {
-                    var stateJson = File.ReadAllText(stateJsonPath);
-                    var stateEntries = JsonConvert.DeserializeObject<List<PlaneStateExportEntry>>(stateJson);
-                    if (stateEntries != null)
-                        foreach (var e in stateEntries.Where(e => !string.IsNullOrEmpty(e.OriginalDLCID)))
-                            originalDlcIds[e.PlaneStringID] = e.OriginalDLCID!;
-                }
-                catch (Exception ex)
-                {
-                    Log($"Could not load state JSON for original DLCIDs: {ex.Message}");
-                }
-            }
+            var originalDlcIds = PlaneStateStore.BuildOriginalDlcIdMap(Log);
             foreach (var p in _allPlanes)
             {
                 if (!string.IsNullOrEmpty(p.DLCID) && !originalDlcIds.ContainsKey(p.PlaneStringID))
@@ -983,7 +952,6 @@ public partial class MainForm : Form
             PlaneDataService.ApplyEnableFlagsToJson(jsonPath, _allPlanes, originalDlcIds, Log);
             PlaneDataService.SaveJsonBackToUAsset(assetPath, jsonPath, Log);
 
-            // Save the same importable state JSON into the unpack folder so it gets packed and can be re-imported after unpack.
             var entriesToSave = _allPlanes
                 .Select(p => new PlaneStateExportEntry
                 {
@@ -992,9 +960,8 @@ public partial class MainForm : Form
                     OriginalDLCID = string.IsNullOrEmpty(p.DLCID) ? null : p.DLCID
                 })
                 .ToList();
-            var jsonToWrite = JsonConvert.SerializeObject(entriesToSave, Formatting.Indented);
-            File.WriteAllText(stateJsonPath, jsonToWrite);
-            Log($"Saved plane state list to {stateJsonPath}");
+            PlaneStateStore.Save(entriesToSave, Log);
+            PlaneStateStore.CopyTo(stateJsonPath, Log);
 
             return true;
         }
@@ -1055,7 +1022,10 @@ public partial class MainForm : Form
 
             var assetPath = PlaneDataService.FindPlayerPlaneDataTable(unpackDir);
             var assetDir = Path.GetDirectoryName(assetPath) ?? unpackDir;
-            var stateJsonPath = Path.Combine(assetDir, "DisableEnabler_plane_states.json");
+            var unpackStateJsonPath = Path.Combine(assetDir, "DisableEnabler_plane_states.json");
+            var stateJsonPath = PlaneStateStore.Exists()
+                ? PlaneStateStore.SidecarPath
+                : unpackStateJsonPath;
             // Use the original internal path that matches stock AC7 layouts
             const string internalPath = "../../../Nimbus/Content/Blueprint/Information/PlayerPlaneDataTable.uasset";
             PakService.CreatePak(unrealPakPath, assetDir, outputPakPath, internalPath, stateJsonPath, Log);
@@ -1257,12 +1227,12 @@ public partial class MainForm : Form
 
             if (hasSearch)
             {
-                var matchesString = plane.PlaneStringID.Contains(searchText, StringComparison.OrdinalIgnoreCase);
-                var matchesName = plane.PlaneName.Contains(searchText, StringComparison.OrdinalIgnoreCase);
-                var matchesMod = plane.ModText.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+                var matchesString = SearchTextNormalizer.Contains(plane.PlaneStringID, searchText);
+                var matchesName = SearchTextNormalizer.Contains(plane.PlaneName, searchText);
+                var matchesMod = SearchTextNormalizer.Contains(plane.ModText, searchText);
                 var matchesId = searchIsNumeric
                     ? plane.PlaneID == searchNumeric
-                    : plane.PlaneID.ToString().Contains(searchText, StringComparison.OrdinalIgnoreCase);
+                    : SearchTextNormalizer.Contains(plane.PlaneID.ToString(), searchText);
 
                 if (!matchesString && !matchesName && !matchesMod && !matchesId)
                     continue;
