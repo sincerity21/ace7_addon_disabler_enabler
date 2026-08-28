@@ -1219,14 +1219,13 @@ public partial class MainForm : Form
         var hideBase = hideBaseGameCheckBox.Checked;
         var hideVr = hideVrPlanesCheckBox.Checked;
 
-        var searchText = searchTextBox.Text;
-        var hasSearch = !string.IsNullOrWhiteSpace(searchText);
+        var searchText = searchTextBox.Text?.Trim();
+        var hasSearch = !string.IsNullOrEmpty(searchText);
         int searchNumeric = 0;
         var searchIsNumeric = false;
 
-        if (hasSearch)
+        if (hasSearch && searchText != null)
         {
-            searchText = searchText.Trim();
             searchIsNumeric = int.TryParse(searchText, out searchNumeric);
         }
 

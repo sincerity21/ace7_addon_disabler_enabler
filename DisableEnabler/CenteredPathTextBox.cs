@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -39,19 +40,21 @@ internal sealed class CenteredPathTextBox : Panel
         remove => _inner.TextChanged -= value;
     }
 
-    public override string? Text
+    [AllowNull]
+    public override string Text
     {
         get => _inner.Text;
         set => _inner.Text = value ?? string.Empty;
     }
 
+    [AllowNull]
     public override Font Font
     {
         get => base.Font;
         set
         {
-            base.Font = value;
-            _inner.Font = value;
+            base.Font = value ?? Control.DefaultFont;
+            _inner.Font = base.Font;
             LayoutInner();
         }
     }

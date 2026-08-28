@@ -11,7 +11,9 @@ namespace DisableEnabler;
 public static class AddonDatabaseService
 {
     private const string DatabaseFileName = "addon_database.json";
-    private const string DefaultRemoteUrl =
+    private const string DefaultGitHubApiUrl =
+        "https://api.github.com/repos/sincerity21/ace7_addon_disabler_enabler/contents/DisableEnabler/addon_database.json?ref=main";
+    private const string DefaultRawUrl =
         "https://raw.githubusercontent.com/sincerity21/ace7_addon_disabler_enabler/main/DisableEnabler/addon_database.json";
 
     private static readonly string LocalPath =
@@ -58,28 +60,50 @@ public static class AddonDatabaseService
 
     public static async Task<bool> TryUpdateFromRemoteAsync(Action<string>? log = null)
     {
-        var remoteUrl = _remoteUrlOverride ?? DefaultRemoteUrl;
-
         try
         {
             using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("DisableEnabler-AddonDatabaseService");
 
-            var separator = remoteUrl.Contains('?') ? "&" : "?";
-            var cacheBustedUrl = $"{remoteUrl}{separator}_t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+            string? json = null;
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, cacheBustedUrl);
-            request.Headers.CacheControl = new CacheControlHeaderValue
+            if (string.IsNullOrWhiteSpace(_remoteUrlOverride))
             {
-                NoCache = true,
-                NoStore = true,
-                MustRevalidate = true
-            };
-            request.Headers.Pragma.ParseAdd("no-cache");
+                // Try GitHub Contents API first with raw media type - bypasses raw.githubusercontent.com 5-min CDN cache
+                try
+                {
+                    using var apiRequest = new HttpRequestMessage(HttpMethod.Get, DefaultGitHubApiUrl);
+                    apiRequest.Headers.Accept.ParseAdd("application/vnd.github.raw");
+                    apiRequest.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true };
 
-            using var response = await client.SendAsync(request).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+                    using var apiResponse = await client.SendAsync(apiRequest).ConfigureAwait(false);
+                    if (apiResponse.IsSuccessStatusCode)
+                    {
+                        json = await apiResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    }
+                }
+                catch
+                {
+                    // Fall back to raw URL below if API fails (e.g. rate limit)
+                }
 
-            var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                if (string.IsNullOrEmpty(json))
+                {
+                    using var rawRequest = new HttpRequestMessage(HttpMethod.Get, DefaultRawUrl);
+                    using var rawResponse = await client.SendAsync(rawRequest).ConfigureAwait(false);
+                    rawResponse.EnsureSuccessStatusCode();
+                    json = await rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                var overrideUrl = _remoteUrlOverride;
+                using var customRequest = new HttpRequestMessage(HttpMethod.Get, overrideUrl);
+                using var customResponse = await client.SendAsync(customRequest).ConfigureAwait(false);
+                customResponse.EnsureSuccessStatusCode();
+                json = await customResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            }
+
             var remote = JsonConvert.DeserializeObject<AddonDatabaseFile>(json);
             if (remote == null || remote.Planes == null)
             {
