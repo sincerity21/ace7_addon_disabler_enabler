@@ -56,11 +56,24 @@ public partial class MainForm : Form
 
     private async Task CheckAddonDatabaseUpdateAsync()
     {
-        await AddonDatabaseService.TryUpdateFromRemoteAsync(msg =>
+        var updated = await AddonDatabaseService.TryUpdateFromRemoteAsync(msg =>
         {
             if (IsHandleCreated && !IsDisposed)
                 BeginInvoke(() => Log(msg));
         }).ConfigureAwait(true);
+
+        if (updated && IsHandleCreated && !IsDisposed)
+        {
+            BeginInvoke(() =>
+            {
+                if (_allPlanes.Count > 0)
+                {
+                    EnrichPlanesFromAddonDatabase();
+                    ApplyPlaneFilters();
+                    planesGrid.Refresh();
+                }
+            });
+        }
     }
 
     private void EnrichPlanesFromAddonDatabase()

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -55,29 +56,45 @@ public static class AddonDatabaseService
         return _cached;
     }
 
-    public static async Task TryUpdateFromRemoteAsync(Action<string>? log = null)
+    public static async Task<bool> TryUpdateFromRemoteAsync(Action<string>? log = null)
     {
         var remoteUrl = _remoteUrlOverride ?? DefaultRemoteUrl;
 
         try
         {
             using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-            var json = await client.GetStringAsync(remoteUrl).ConfigureAwait(false);
+
+            var separator = remoteUrl.Contains('?') ? "&" : "?";
+            var cacheBustedUrl = $"{remoteUrl}{separator}_t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, cacheBustedUrl);
+            request.Headers.CacheControl = new CacheControlHeaderValue
+            {
+                NoCache = true,
+                NoStore = true,
+                MustRevalidate = true
+            };
+            request.Headers.Pragma.ParseAdd("no-cache");
+
+            using var response = await client.SendAsync(request).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var remote = JsonConvert.DeserializeObject<AddonDatabaseFile>(json);
             if (remote == null || remote.Planes == null)
             {
                 log?.Invoke("Remote addon database response was invalid; keeping local copy.");
-                return;
+                return false;
             }
 
             var localRevision = File.Exists(LocalPath)
-                ? (_cached.Revision > 0 ? _cached.Revision : ReadRevisionFromDisk())
+                ? ReadRevisionFromDisk()
                 : 0;
 
             if (remote.Revision <= localRevision)
             {
                 log?.Invoke($"Addon database up to date (revision {localRevision}).");
-                return;
+                return false;
             }
 
             var tempPath = LocalPath + ".tmp";
@@ -88,10 +105,12 @@ public static class AddonDatabaseService
 
             _cached = remote;
             log?.Invoke($"Updated addon database to revision {remote.Revision} ({remote.Planes.Count} entries).");
+            return true;
         }
         catch (Exception ex)
         {
             log?.Invoke($"Addon database update check failed: {ex.Message}");
+            return false;
         }
     }
 
