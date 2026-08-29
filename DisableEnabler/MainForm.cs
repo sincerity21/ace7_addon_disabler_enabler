@@ -26,7 +26,7 @@ public partial class MainForm : Form
     private readonly List<PlaneDataRow> _allPlanes = new();
     private readonly HashSet<int> _selectedRowIndexes = new();
     private static readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DisableEnabler.config");
-    private bool _isDarkMode;
+    private bool _isDarkMode = true;
     private string? _modsOutputFolder;
     private WorkflowStep _workflowStep = WorkflowStep.NoPak;
     private int _pakScanRunning;

@@ -249,6 +249,7 @@ public partial class MainForm
         darkModeCheckBox.Margin = new Padding(0);
         darkModeCheckBox.TextAlign = ContentAlignment.MiddleLeft;
         darkModeCheckBox.Text = "Dark Mode";
+        darkModeCheckBox.Checked = true;
         darkModeCheckBox.CheckedChanged += darkModeCheckBox_CheckedChanged;
 
         actionsLeft.Controls.Add(unpackAndLoadButton);
