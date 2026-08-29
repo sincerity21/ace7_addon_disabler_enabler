@@ -19,5 +19,8 @@ public class PlaneDataRow
 
     /// <summary>When set, Mod column is a clickable link to this URL.</summary>
     public string ModUrl { get; set; } = string.Empty;
+
+    /// <summary>Notes column label (Notes2 from database).</summary>
+    public string NotesText { get; set; } = string.Empty;
 }
 

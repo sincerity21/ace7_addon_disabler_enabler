@@ -129,7 +129,7 @@ public partial class MainForm
         subtitleLabel.Location = new Point(ContentPad, 36);
         subtitleLabel.Text = "AN ADD-ON MANAGEMENT TOOL BY SINCERITY";
 
-        activeModsChip.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        activeModsChip.Anchor = AnchorStyles.None;
         activeModsChip.Size = new Size(170, 30);
         activeModsDot.Size = new Size(10, 10);
         activeModsDot.Location = new Point(12, 10);
@@ -140,7 +140,7 @@ public partial class MainForm
         activeModsChip.Controls.Add(activeModsDot);
         activeModsChip.Controls.Add(activeModsLabel);
 
-        statusChip.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        statusChip.Anchor = AnchorStyles.None;
         statusChip.Size = new Size(200, 30);
         statusPrefixLabel.AutoSize = true;
         statusPrefixLabel.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
@@ -328,8 +328,17 @@ public partial class MainForm
             Name = "Mod",
             HeaderText = "Origin",
             DataPropertyName = "ModText",
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+            MinimumWidth = 80,
+            ReadOnly = true
+        });
+        planesGrid.Columns.Add(new DataGridViewTextBoxColumn
+        {
+            Name = "Notes",
+            HeaderText = "Notes",
+            DataPropertyName = "NotesText",
             AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-            MinimumWidth = 120,
+            MinimumWidth = 80,
             ReadOnly = true
         });
         planesGrid.CurrentCellDirtyStateChanged += planesGrid_CurrentCellDirtyStateChanged;
@@ -406,6 +415,7 @@ public partial class MainForm
         activeModsChip.Top = 14;
         statusChip.Left = right - statusChip.Width;
         activeModsChip.Left = statusChip.Left - Gap - activeModsChip.Width;
+        headerPanel.Invalidate();
     }
 
     private void LayoutPaths()

@@ -36,6 +36,8 @@ public partial class MainForm : Form
 
     public MainForm()
     {
+        DoubleBuffered = true;
+        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer, true);
         InitializeComponent();
         planesGrid.AutoGenerateColumns = false;
         planesGrid.DataSource = _planes;
@@ -119,12 +121,12 @@ public partial class MainForm : Form
     }
 
     /// <summary>
-    /// Keeps PlaneStringID and Name tight to content so they stay left-aligned next to PlaneID.
-    /// Mod uses Fill for any remaining grid width.
+    /// Keeps compact columns (PlaneID, PlaneStringID, Name, Origin) tight to content,
+    /// while Notes fills all remaining space on the right of the table.
     /// </summary>
     private void FitCompactGridColumns()
     {
-        foreach (var columnName in new[] { "PlaneStringID", "Name" })
+        foreach (var columnName in new[] { "PlaneID", "PlaneStringID", "Name", "Mod" })
         {
             if (planesGrid.Columns[columnName] is { } col)
                 col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
@@ -132,8 +134,8 @@ public partial class MainForm : Form
 
         planesGrid.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
-        if (planesGrid.Columns["Mod"] is { } modCol)
-            modCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        if (planesGrid.Columns["Notes"] is { } notesCol)
+            notesCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
     }
 
     private void darkModeCheckBox_CheckedChanged(object? sender, EventArgs e)
@@ -243,13 +245,18 @@ public partial class MainForm : Form
         panel.Tag = cyanBorder ? UiTheme.CyanDim(dark) : UiTheme.Border(dark);
         panel.Paint -= PanelChipBorder_Paint;
         panel.Paint += PanelChipBorder_Paint;
-        panel.Resize -= SoftChip_Resize;
+        panel.Resize -= Chip_Resize;
+        panel.Resize += Chip_Resize;
         panel.Invalidate();
     }
 
-    private static void SoftChip_Resize(object? sender, EventArgs e)
+    private static void Chip_Resize(object? sender, EventArgs e)
     {
-        // Kept for compatibility; chips use hard corners again.
+        if (sender is Panel panel)
+        {
+            panel.Invalidate();
+            panel.Parent?.Invalidate();
+        }
     }
 
     private static void PanelSeparator_Paint(object? sender, PaintEventArgs e)
@@ -1254,11 +1261,12 @@ public partial class MainForm : Form
                 var matchesString = SearchTextNormalizer.Contains(plane.PlaneStringID, searchText);
                 var matchesName = SearchTextNormalizer.Contains(plane.PlaneName, searchText);
                 var matchesMod = SearchTextNormalizer.Contains(plane.ModText, searchText);
+                var matchesNotes = SearchTextNormalizer.Contains(plane.NotesText, searchText);
                 var matchesId = searchIsNumeric
                     ? plane.PlaneID == searchNumeric
                     : SearchTextNormalizer.Contains(plane.PlaneID.ToString(), searchText);
 
-                if (!matchesString && !matchesName && !matchesMod && !matchesId)
+                if (!matchesString && !matchesName && !matchesMod && !matchesNotes && !matchesId)
                     continue;
             }
 

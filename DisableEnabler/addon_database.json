@@ -1,5 +1,5 @@
 {
-    "revision": 5,
+    "revision": 6,
     "planes": {
         "f04e": {
             "PlaneName": "F-4E Phantom II",
@@ -284,19 +284,19 @@
             "URL": "https://store.steampowered.com/app/1692460/ACE_COMBAT7_SKIES_UNKNOWN_25th_Anniversary_DLC__CuttingEdge_Aircraft_Series_Set/"
         },
         "f18f_vr": {
-            "PlaneName": "F/A-18F",
+            "PlaneName": "F/A-18F Super Hornet",
             "Notes": "PRE-CAMPAIGN MOD (WIP)",
             "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
         },
         "a10a_vr": {
-            "PlaneName": "A-10C",
+            "PlaneName": "A-10C Thunderbolt II",
             "Notes": "PRE-CAMPAIGN MOD (WIP)",
             "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
         },
         "f22a_vr": {
-            "PlaneName": "F-22A",
+            "PlaneName": "F-22A Raptor",
             "Notes": "PRE-CAMPAIGN MOD (WIP)",
             "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
@@ -308,97 +308,97 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
         },
         "f15c_vr": {
-            "PlaneName": "F-15C",
+            "PlaneName": "F-15C Eagle",
             "Notes": "PRE-CAMPAIGN MOD (WIP)",
             "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
         },
         "f16c_vr": {
-            "PlaneName": "F-16C",
+            "PlaneName": "F-16C Fighting Falcon",
             "Notes": "PRE-CAMPAIGN MOD (WIP)",
             "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
         },
         "f35c_vr": {
-            "PlaneName": "F-35C",
+            "PlaneName": "F-35C Lightning II",
             "Notes": "PRE-CAMPAIGN MOD (WIP)",
             "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
         },
         "f04e_vr": {
-            "PlaneName": "F-4E",
+            "PlaneName": "F-4E Phantom II",
             "Notes": "PRE-CAMPAIGN MOD (WIP)",
             "Notes2": "Leftover from the PS4 Port, usable with the Pre-Campaign Mod.",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3223"
         },
         "zx01": {
-            "PlaneName": "ADFX-00(AC2)",
+            "PlaneName": "ADFX-00 Prototype Falken(AC2)",
             "Notes": "ADFX-00 Prototype Falken(Addon Aircraft)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3210?tab=files"
         },
         "zx02": {
-            "PlaneName": "ADFX-00(ACI)",
+            "PlaneName": "ADFX-00 Prototype Falken(ACI)",
             "Notes": "ADFX-00 Prototype Falken(Addon Aircraft)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3210?tab=files"
         },
         "zx03": {
-            "PlaneName": "ADFX-00(EX)",
+            "PlaneName": "ADFX-00 Prototype Falken(EX)",
             "Notes": "ADFX-00 Prototype Falken(Addon Aircraft)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3210?tab=files"
         },
         "zx04": {
-            "PlaneName": "ADFX-00(SP)",
+            "PlaneName": "ADFX-00 Prototype Falken(SP)",
             "Notes": "ADFX-00 Prototype Falken(Addon Aircraft)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3210?tab=files"
         },
         "su27": {
-            "PlaneName": "Su-27",
+            "PlaneName": "Su-27 Flanker-B",
             "Notes": "Su-27 Flanker-B Model-Swap",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2139"
         },
         "f104av": {
-            "PlaneName": "F-104C -AV-",
+            "PlaneName": "F-104C -Avril-",
             "Notes": "Playable F-104C -Avril-",
             "Notes2": "Originally from Base Game, an exclusive Free Flight-only aircraft.",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2178"
         },
         "f104av2": {
-            "PlaneName": "F-104C -AV- Mod.B",
+            "PlaneName": "F-104C -Avril- Model B",
             "Notes": "Playable F-104C -Avril-",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2178"
         },
         "ea18g": {
-            "PlaneName": "EA-18G Mod.A",
+            "PlaneName": "EA-18G Growler - Variant A",
             "Notes": "EA-18G Growler Model Swap and AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2172"
         },
         "ea18g1": {
-            "PlaneName": "EA-18G Mod.B",
+            "PlaneName": "EA-18G Growler - Variant B",
             "Notes": "EA-18G Growler Model Swap and AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2172"
         },
         "fa36": {
-            "PlaneName": "XFA-36A",
+            "PlaneName": "XFA-36A Game",
             "Notes": "Memory Error - XFA-36A Add-On Modpack",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3520"
         },
         "f18r": {
-            "PlaneName": "F/A-18R",
+            "PlaneName": "F/A-18R Bourdon",
             "Notes": "Kitbash FA-18R Bourdon Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2203"
         },
         "uav11": {
-            "PlaneName": "ADF-11",
+            "PlaneName": "ADF-11 Raven",
             "Notes": "Playable Drones Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2186"
@@ -410,79 +410,79 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2186"
         },
         "uavc": {
-            "PlaneName": "MQ-99",
+            "PlaneName": "MQ-99 Wasp",
             "Notes": "Playable Drones Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2186"
         },
         "uavcx": {
-            "PlaneName": "MQ-99SK(V)2/C-8",
+            "PlaneName": "MQ-99SK(V)2/C-8 Stinger",
             "Notes": "Playable Drones Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2186"
         },
         "m101": {
-            "PlaneName": "MQ-101",
+            "PlaneName": "MQ-101 Vogel",
             "Notes": "Playable Drones Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2186"
         },
         "x49a": {
-            "PlaneName": "X-49",
+            "PlaneName": "X-49 Night Raven",
             "Notes": "X-49 Night Raven - Custom Aircraft",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/1913"
         },
         "adlra": {
-            "PlaneName": "ADA-01A",
+            "PlaneName": "ADA-01A Adler",
             "Notes": "ADA-01 Adler - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/1770"
         },
         "adlrb": {
-            "PlaneName": "ADA-01B",
+            "PlaneName": "ADA-01B Adler",
             "Notes": "ADA-01 Adler - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/1770"
         },
         "r101": {
-            "PlaneName": "R-101",
+            "PlaneName": "R-101 Delphinus 1",
             "Notes": "R-101 Delphinus 1 Model-swap",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/1584"
         },
         "fa32": {
-            "PlaneName": "F/A-32C",
+            "PlaneName": "F/A-32C Erne",
             "Notes": "FA-32C Erne Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2210"
         },
         "su25a": {
-            "PlaneName": "Su-25TM1",
+            "PlaneName": "Su-25TM1 Frogfoot",
             "Notes": "Su-25TM Rook - Add On",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2216"
         },
         "su25b": {
-            "PlaneName": "Su-25TM2",
+            "PlaneName": "Su-25TM2 Frogfoot",
             "Notes": "Su-25TM Rook - Add On",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2216"
         },
         "m144": {
-            "PlaneName": "MiG-1.44",
+            "PlaneName": "MiG-1.44 Flatpack",
             "Notes": "MiG-1.44 Flatpack - AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2231"
         },
         "f14b": {
-            "PlaneName": "F-14B",
+            "PlaneName": "F-14B Tomcat",
             "Notes": "F-14B Tomcat Model Swap and AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2219"
         },
         "su75": {
-            "PlaneName": "Su-75",
+            "PlaneName": "Su-75 Checkmate",
             "Notes": "Su-75 Checkmate - AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3586"
@@ -494,49 +494,49 @@
             "URL": ""
         },
         "f22c": {
-            "PlaneName": "F/A-22C",
+            "PlaneName": "F/A-22C Raptor Plus",
             "Notes": "FA-22C Raptor Plus (Skin Slot Weapons Swap and Addon)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2239"
         },
         "e06b": {
-            "PlaneName": "EA-6B",
+            "PlaneName": "EA-6B Prowler",
             "Notes": "EA-6B Prowler - AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2244"
         },
         "f17a": {
-            "PlaneName": "F-117A",
+            "PlaneName": "F-117A Nighthawk",
             "Notes": "F-117A Nighthawk - AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2245"
         },
         "f05e": {
-            "PlaneName": "F/A-5E",
+            "PlaneName": "F/A-5E Super Tiger",
             "Notes": "Tiger Pack - AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2246"
         },
         "f20a": {
-            "PlaneName": "F/A-20",
+            "PlaneName": "F/A-20 Super Tigershark",
             "Notes": "Tiger Pack - AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2246"
         },
         "j20a": {
-            "PlaneName": "J-20A",
+            "PlaneName": "J-20A Mighty Dragon",
             "Notes": "J-20A Mighty Dragon Overhauled with Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2267"
         },
         "j20x1": {
-            "PlaneName": "Mjölnir R-40 Mk. I",
+            "PlaneName": "Mjölnir R-40 Mark I",
             "Notes": "J-20A Mighty Dragon Overhauled with Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2267"
         },
         "j20x2": {
-            "PlaneName": "Mjölnir R-40 Mk. II",
+            "PlaneName": "Mjölnir R-40 Mark II",
             "Notes": "J-20A Mighty Dragon Overhauled with Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2267"
@@ -548,55 +548,55 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3210?tab=files"
         },
         "pkdp": {
-            "PlaneName": "MiG-41MKS",
+            "PlaneName": "MiG-41MKS Fulmar-B2",
             "Notes": "MiG-41MKS Fulmar-B2 (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2331"
         },
         "rx78": {
-            "PlaneName": "RX-78-2",
-            "Notes": "RX-78-2 Gundam Addon (TEMPORARILY HIDDEN)",
+            "PlaneName": "RX-78-2 Gundam",
+            "Notes": "RX-78-2 Gundam Addon (REMOVED BY AUTHOR)",
             "Notes2": "",
             "URL": ""
         },
         "r172": {
-            "PlaneName": "Rh-172",
+            "PlaneName": "Rh-172 Chaetura II",
             "Notes": "Rh-172 Chaetura II - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2345"
         },
         "f16vx": {
-            "PlaneName": "F-16VX",
+            "PlaneName": "F-16VX Silent Viper",
             "Notes": "F-16VX Silent Viper - AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2347"
         },
         "m31m": {
-            "PlaneName": "MiG-31M2",
+            "PlaneName": "MiG-31M2 Foxhound-B",
             "Notes": "MiG-31M2 Foxhound-B - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2381"
         },
         "f15n": {
-            "PlaneName": "F-15N",
+            "PlaneName": "F-15N Sea Eagle",
             "Notes": "F-15N Sea Eagle (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2382"
         },
         "pw01": {
-            "PlaneName": "PW-Mk.I",
+            "PlaneName": "Project Wingman Mark I",
             "Notes": "PW-MKI - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/1565"
         },
         "gaf1v1": {
-            "PlaneName": "GAF-1 - Variant A",
+            "PlaneName": "GAF-1 Varcolac - Variant A",
             "Notes": "GAF-1 Varcolac - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/1922"
         },
         "gaf1v2": {
-            "PlaneName": "GAF-1 - Variant B",
+            "PlaneName": "GAF-1 Varcolac - Variant B",
             "Notes": "GAF-1 Varcolac - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/1922"
@@ -620,55 +620,55 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2424"
         },
         "fa24": {
-            "PlaneName": "XFA-24A",
+            "PlaneName": "XFA-24A Apalis",
             "Notes": "End Of Deception - Ace Combat X Add-on Modpack",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2479"
         },
         "yr99": {
-            "PlaneName": "YR-99",
+            "PlaneName": "YR-99 Forneus",
             "Notes": "End Of Deception - Ace Combat X Add-on Modpack",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2479"
         },
         "yrb89": {
-            "PlaneName": "YRB-89",
+            "PlaneName": "YRB-89 Naberius",
             "Notes": "End Of Deception - Ace Combat X Add-on Modpack",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2479"
         },
         "yr302": {
-            "PlaneName": "YR-302",
+            "PlaneName": "YR-302 Fregata",
             "Notes": "End Of Deception - Ace Combat X Add-on Modpack",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2479"
         },
         "xr302": {
-            "PlaneName": "XR-302",
+            "PlaneName": "XR-302 Fregatidae",
             "Notes": "End Of Deception - Ace Combat X Add-on Modpack",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2479"
         },
         "xr45": {
-            "PlaneName": "XR-45",
+            "PlaneName": "XR-45 Cariburn",
             "Notes": "End Of Deception - Ace Combat X Add-on Modpack",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2479"
         },
         "f16f": {
-            "PlaneName": "F-16F",
+            "PlaneName": "F-16F Desert Falcon",
             "Notes": "F-16F Desert Falcon Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3720"
         },
         "ua45": {
-            "PlaneName": "UAV-45R",
+            "PlaneName": "UAV-45R Malebolge",
             "Notes": "UAV-45R Malebolge - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2516"
         },
         "s32": {
-            "PlaneName": "S-32",
+            "PlaneName": "S-32 Prototype Berkut",
             "Notes": "S-32 - Aircraft Add-on",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2524"
@@ -680,13 +680,13 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2548"
         },
         "f85b": {
-            "PlaneName": "F-85B",
+            "PlaneName": "F-85B Bullshark",
             "Notes": "F-85B  Bullshark (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2552"
         },
         "a4nk": {
-            "PlaneName": "A-4NK",
+            "PlaneName": "A-4NK Skyhawk II",
             "Notes": "A-4NK Skyhawk II",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2563"
@@ -698,31 +698,31 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2584"
         },
         "f15se": {
-            "PlaneName": "F-15SE",
+            "PlaneName": "F-15SE Silent Eagle",
             "Notes": "F-15SE Silent Eagle Model Swap and AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2595"
         },
         "x02sb1": {
-            "PlaneName": "X-02S Block.1",
+            "PlaneName": "X-02S Block.1 Strike Wyvern",
             "Notes": "X-02S Block.1 Strike Wyvern",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2623"
         },
         "tr06": {
-            "PlaneName": "TR-6",
+            "PlaneName": "Gundam TR-6 Woundwort",
             "Notes": "Gundam TR-6 Woundwort Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2641"
         },
         "f15cx": {
-            "PlaneName": "F-15CX",
+            "PlaneName": "F-15CX Eagle II",
             "Notes": "F-15CX Eagle II (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2671"
         },
         "f27c": {
-            "PlaneName": "F/A-27C",
+            "PlaneName": "F/A-27C Dagger",
             "Notes": "FA-27C - Aircraft Add-On (Project Snow Wind)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2676"
@@ -734,139 +734,139 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2652"
         },
         "y141": {
-            "PlaneName": "Yak-141",
+            "PlaneName": "Yak-141 Freestyle",
             "Notes": "Yak-141 Freestyle Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2724"
         },
         "xa20": {
-            "PlaneName": "XA-20 Type 1",
+            "PlaneName": "XA-20 Razorback (Type 1)",
             "Notes": "XA-20 Razorback (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2734"
         },
         "xa20b": {
-            "PlaneName": "XA-20 Type 2",
+            "PlaneName": "XA-20 Razorback (Type 2)",
             "Notes": "XA-20 Razorback (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2734"
         },
         "su33ubm": {
-            "PlaneName": "Su-33UBM",
+            "PlaneName": "Su-33UBM Flanker-X3",
             "Notes": "Su-33UBM - A Flanker Aircraft Addon -",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2737"
         },
         "x02a": {
-            "PlaneName": "X-02A",
+            "PlaneName": "X-02A Wyvern",
             "Notes": "X-02A Wyvern - Model Add-On",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2772"
         },
         "m23m": {
-            "PlaneName": "MiG-23MLD",
+            "PlaneName": "MiG-23MLD Flogger-K",
             "Notes": "MiG-23MLD Flogger-K - Custom Aircraft",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2787"
         },
         "f7": {
-            "PlaneName": "F-7",
+            "PlaneName": "F-7 Arashi",
             "Notes": "F-7 Arashi Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2805"
         },
         "f35b": {
-            "PlaneName": "F-35B - Stealth Mode",
+            "PlaneName": "F-35B Lightning II (Stealth Mode)",
             "Notes": "F-35B Lightning II (ADDON and SWAP)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2821"
         },
         "f35bs": {
-            "PlaneName": "F-35B - Beast Mode",
+            "PlaneName": "F-35B Lightning II (Beast Mode)",
             "Notes": "F-35B Lightning II (ADDON and SWAP)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2821"
         },
         "fck1": {
-            "PlaneName": "F-CK-1C",
+            "PlaneName": "EIDF F-CK-1C",
             "Notes": "EIDF F-CK-1C",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2870"
         },
         "geier": {
-            "PlaneName": "ADFY-00",
+            "PlaneName": "ADFY-00 Geier",
             "Notes": "ADFY-00 Geier - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2895"
         },
         "f35d": {
-            "PlaneName": "F-35D",
+            "PlaneName": "F-35D Lightning Viper",
             "Notes": "F-35D Lighting Viper - AddOn Aircraft Mod",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2902"
         },
         "rmq4": {
-            "PlaneName": "R/MQ-4F",
+            "PlaneName": "R/MQ-4F Scope Hawk",
             "Notes": "R/MQ-4F Scope Hawk - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2916"
         },
         "adf11x": {
-            "PlaneName": "ADF-11X",
+            "PlaneName": "ADF-11X Advanced Raven",
             "Notes": "ADF-11X Advanced Raven - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2850"
         },
         "su27m": {
-            "PlaneName": "Su-27M",
+            "PlaneName": "Su-27M Super Flanker",
             "Notes": "Su-27M Super Flanker (AddOn)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2930"
         },
         "su27mks": {
-            "PlaneName": "Su-27MKS",
+            "PlaneName": "Su-27MKS Super Flanker",
             "Notes": "Su-27M Super Flanker (AddOn)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2930"
         },
         "j37d_a": {
-            "PlaneName": "Viggen (A)",
+            "PlaneName": "JA-37D Viggen (var. A)",
             "Notes": "Saab 37 Viggen - Custom Aircraft",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2934"
         },
         "j37d_b": {
-            "PlaneName": "Viggen (B)",
+            "PlaneName": "JA-37D Viggen (var. B)",
             "Notes": "Saab 37 Viggen - Custom Aircraft",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2934"
         },
         "wuav": {
-            "PlaneName": "WUAV-R",
+            "PlaneName": "Weapon UAV - Remote",
             "Notes": "Playable Weapon UAV - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2958"
         },
         "f15d": {
-            "PlaneName": "F-15D",
+            "PlaneName": "F-15D Eagle",
             "Notes": "F-15D Eagle (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2957"
         },
         "su34k": {
-            "PlaneName": "Su-34K",
+            "PlaneName": "Su-34K Fullhouse",
             "Notes": "Su-34K Fullhouse Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2879"
         },
         "qh66": {
-            "PlaneName": "A/QH-66",
+            "PlaneName": "A/QH-66 Comanche",
             "Notes": "A/QH-66 Comanche - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2997"
         },
         "su35sx": {
-            "PlaneName": "Su-35SX",
+            "PlaneName": "Su-35SX Fairy",
             "Notes": "Su-35SX Fairy - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3007"
@@ -878,67 +878,67 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3035"
         },
         "fa50": {
-            "PlaneName": "CFA-50",
+            "PlaneName": "CFA-50 Martolea",
             "Notes": "CFA-50 Martolea - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3038"
         },
         "sluav": {
-            "PlaneName": "SLUAV",
+            "PlaneName": "Submarine-Launched UAV",
             "Notes": "Playable SLUAV - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3064"
         },
         "f18c": {
-            "PlaneName": "F/A-18C+",
+            "PlaneName": "F/A-18C+ Hornet",
             "Notes": "F/A-18C+ Hornet (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3065"
         },
         "b01r": {
-            "PlaneName": "B-1R",
+            "PlaneName": "B-1R Lancer",
             "Notes": "B-1R Lancer - Custom AIrcraft",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2706"
         },
         "f35a": {
-            "PlaneName": "F-35A",
+            "PlaneName": "F-35A Lightning II",
             "Notes": "F-35A Lightning II (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3212"
         },
         "m20": {
-            "PlaneName": "A/MQ-20B",
+            "PlaneName": "A/MQ-20B Marauder",
             "Notes": "A/MQ-20B Marauder - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3222"
         },
         "j20b": {
-            "PlaneName": "J-20B",
+            "PlaneName": "J-20B Wēilóng",
             "Notes": "J-20 Overhaul Project",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3239"
         },
         "rf71": {
-            "PlaneName": "RF-71",
+            "PlaneName": "RF-71 Oxwagon",
             "Notes": "RF-71 Oxwagon - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3270"
         },
         "x02r": {
-            "PlaneName": "X-02R (A)",
+            "PlaneName": "X-02R Phantom Wyvern (Var. A)",
             "Notes": "X-02R Phantom Wyvern - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3266"
         },
         "x02rv2": {
-            "PlaneName": "X-02R (B)",
+            "PlaneName": "X-02R Phantom Wyvern (Var. B)",
             "Notes": "X-02R Phantom Wyvern - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3266"
         },
         "vf1j": {
-            "PlaneName": "VF-1J",
+            "PlaneName": "VF-1J Valkyrie",
             "Notes": "VF-1 Valkyrie (Super Dimension Fortress Macross)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/2576"
@@ -950,49 +950,49 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3301"
         },
         "hrud": {
-            "PlaneName": "FF-X29A",
+            "PlaneName": "FF-X29A G-Parts [Hrududu]",
             "Notes": "FF-X29A G-Parts Hrududu Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3303"
         },
         "kf38": {
-            "PlaneName": "KF-38",
+            "PlaneName": "KF-38 Black Eagle",
             "Notes": "KAI KF-38 Black Eagle Concept - A Berkut Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3305"
         },
         "arsb": {
-            "PlaneName": "Arsenal Bird",
+            "PlaneName": "Aerial Arsenal Ship",
             "Notes": "Arsenal Bird - Custom Aircraft",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3317"
         },
         "f32a": {
-            "PlaneName": "F-32A",
+            "PlaneName": "F-32A Albicilla",
             "Notes": "F-32A Albicilla (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3319"
         },
         "f15ex11": {
-            "PlaneName": "F-15EX (CFT)",
+            "PlaneName": "F-15EX Eagle II (Conformal Fuel Tanks)",
             "Notes": "F-15EX Eagle II - AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3318"
         },
         "f15ex21": {
-            "PlaneName": "F-15EX (Standard)",
+            "PlaneName": "F-15EX Eagle II (Standard)",
             "Notes": "F-15EX Eagle II - AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3318"
         },
         "su27ub": {
-            "PlaneName": "Su-27UB",
+            "PlaneName": "Su-27UB Flanker-C",
             "Notes": "Su-27UB Flanker-C Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3345"
         },
         "rm21": {
-            "PlaneName": "R/MQ-21",
+            "PlaneName": "R/MQ-21 Tagboard",
             "Notes": "R/MQ-21 Tagboard - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3361"
@@ -1004,25 +1004,25 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3363"
         },
         "fa308": {
-            "PlaneName": "QFA-308",
+            "PlaneName": "QFA-308 Volkihar",
             "Notes": "QFA-308 Volkihar - A Nosferatu Family Aircraft Addon -",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3368"
         },
         "uf37": {
-            "PlaneName": "S.Flanker",
+            "PlaneName": "Super Flanker",
             "Notes": "(ESR) Super Flanker -Ryth Ver.- (Addon Aircraft)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3062?tab=files"
         },
         "su37u": {
-            "PlaneName": "Su-37U",
+            "PlaneName": "Su-37U Super Flanker",
             "Notes": "Su-37U Super Flanker Addon -Ver.CG-",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3380"
         },
         "fa27s": {
-            "PlaneName": "FA-27S",
+            "PlaneName": "FA-27S Cyanocorax",
             "Notes": "FA-27S Cyanocorax - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3404"
@@ -1034,109 +1034,109 @@
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3461"
         },
         "f86f": {
-            "PlaneName": "F-86F",
+            "PlaneName": "F-86F Sabre",
             "Notes": "MiG Alley Pack",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3461"
         },
         "ui4054": {
-            "PlaneName": "UI-4054",
+            "PlaneName": "UI-4054 Aurora",
             "Notes": "UI-4054 Aurora - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3465"
         },
         "f15smt": {
-            "PlaneName": "F-15S/MT",
+            "PlaneName": "F-15S/MT Eagle+",
             "Notes": "F-15S/MT Eagle+ - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3517"
         },
         "f18b3": {
-            "PlaneName": "F/A-18E Block III",
+            "PlaneName": "F/A-18E Super Hornet Block III",
             "Notes": "F/A-18E Super Hornet Block III (Addon and Swap)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3518"
         },
         "yf36": {
-            "PlaneName": "YF-36",
+            "PlaneName": "YF-36 Aquila",
             "Notes": "Memory Error - XFA-36A Add-On Modpack",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3520"
         },
         "qfa36": {
-            "PlaneName": "QFA-36 Game",
+            "PlaneName": "QFA-36 Game Plus",
             "Notes": "Memory Error - XFA-36A Add-On Modpack",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3520"
         },
         "s75": {
-            "PlaneName": "S-75",
+            "PlaneName": "S-75 Checkmate",
             "Notes": "S-75 Checkmate - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3586"
         },
         "f15x": {
-            "PlaneName": "F-15S/XF",
+            "PlaneName": "F-15S/XF Eagle Plus",
             "Notes": "(ESR) F-15SXF Eagle Plus",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3062?tab=files"
         },
         "su30mkm": {
-            "PlaneName": "Su-30MKM",
+            "PlaneName": "Su-30MKM Flanker-H",
             "Notes": "Su-30MKM - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3585"
         },
         "f15n2": {
-            "PlaneName": "F-15M",
+            "PlaneName": "F-15M Sea Eagle II",
             "Notes": "F-15M Sea Eagle II (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3592"
         },
         "v55": {
-            "PlaneName": "V-55 Mk. 2",
+            "PlaneName": "Arvakr V-55 Mark 2",
             "Notes": "Arvakr V-55 (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3615"
         },
         "v55b": {
-            "PlaneName": "V-55 Mk. 1",
+            "PlaneName": "Arvakr V-55 Mark 1",
             "Notes": "Arvakr V-55 (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3615"
         },
         "su30mki": {
-            "PlaneName": "Su-30MKI",
+            "PlaneName": "Su-30MKI Flanker-H",
             "Notes": "Su-30MKI Flanker-H - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3626"
         },
         "b02m": {
-            "PlaneName": "B-2M",
+            "PlaneName": "B-2M Searing Spirit",
             "Notes": "B-2M Searing Spirit - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3643"
         },
         "f17v": {
-            "PlaneName": "F-17V",
+            "PlaneName": "F-17V Frocher",
             "Notes": "F-17V Frocher - Aircraft AddOn",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3600"
         },
         "yf30": {
-            "PlaneName": "YF-30",
+            "PlaneName": "YF-30 Chronos",
             "Notes": "YF-30 Chronos Addon",
             "Notes2": "",
             "URL": "www.nexusmods.com/acecombat7skiesunknown/mods/3653"
         },
         "s44": {
-            "PlaneName": "S-44",
+            "PlaneName": "S-44 Mogilnik",
             "Notes": "S-44 Mogilnik - Aircraft Addon",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3728"
         },
         "j15t": {
-            "PlaneName": "J-15T",
+            "PlaneName": "J-15T Flying Shark",
             "Notes": "J-15T Flying Shark (ADDON)",
             "Notes2": "",
             "URL": "https://www.nexusmods.com/acecombat7skiesunknown/mods/3738"

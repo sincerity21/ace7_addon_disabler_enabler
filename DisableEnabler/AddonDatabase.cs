@@ -20,6 +20,9 @@ public sealed class AddonPlaneEntry
     [JsonProperty("Notes")]
     public string? Notes { get; set; }
 
+    [JsonProperty("Notes2")]
+    public string? Notes2 { get; set; }
+
     [JsonProperty("URL")]
     public string? URL { get; set; }
 }

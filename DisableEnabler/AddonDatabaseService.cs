@@ -150,11 +150,13 @@ public static class AddonDatabaseService
             row.PlaneName = string.Empty;
             row.ModText = string.Empty;
             row.ModUrl = string.Empty;
+            row.NotesText = string.Empty;
 
             if (!lookup.TryGetValue(row.PlaneStringID, out var entry))
                 continue;
 
             row.PlaneName = entry.PlaneName ?? string.Empty;
+            row.NotesText = entry.Notes2?.Trim() ?? string.Empty;
 
             var notes = entry.Notes?.Trim() ?? string.Empty;
             var url = entry.URL?.Trim() ?? string.Empty;
